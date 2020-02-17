@@ -1,55 +1,34 @@
 <!DOCTYPE html>
 <html>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
-<!-- 
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-
-<script>
-var app = angular.module("myShoppingList", []); 
-app.controller("myCtrl", function($scope) {
-    $scope.IS_IN_MUTE = true;
-});
-</script> -->
-
-
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
   <head>
     <script src="https://unpkg.com/konva@4.1.5/konva.min.js"></script>
     <meta charset="utf-8" />
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background-color: #f0f0f0;
-      }
+    body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    }
     </style>
   </head>
   <body>
     <div id="container"></div>
-
-<button id="go_all" onclick="showAll()">Start the whole thing</button>
-<div id="allInteraction"> <!-- the thing we are going to hide-->
-<br>
-<br>
-Instructions: <input type="text" id="myText" size="55" value="start the music!">
-<p>Type your instructions to the orchestra then press enter or this button below</p>
-<button id="myButton" onclick="doInstructionExecution()">Submit Instructions</button>
-<br><br>
-
-<button id="myMuteButton" onclick="doMute()">MUTE!</button>
-</div>
-
-<script src="customlibs.js"></script>
-<script src="corelogic.js"></script>
-<script src="start.js"></script>
-<script src="NoSleep.js"></script>
-    <script src='konva_visual.js'>    </script>
-
+    <button id="go_all" onclick="showAll()">Start the whole thing</button>
+    <div id="allInteraction"> <!-- the thing we are going to hide-->
+    <br>
+    <br>
+    Instructions: <input type="text" id="myText" size="55" value="start the music!">
+    <p>Type your instructions to the orchestra then press enter or this button below</p>
+    <button id="myButton" onclick="doInstructionExecution()">Submit Instructions</button>
+    <br><br>
+    <button id="myMuteButton" onclick="doMute()">MUTE!</button>
+  </div>
+  <script src="customlibs.js"></script>
+  <script src="corelogic.js"></script>
+  <script src="start.js"></script>
+  <script src="NoSleep.js"></script>
+  <script src='konva_visual.js'>    </script>
 </body>
 </html>
-
-
-
-
-
