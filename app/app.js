@@ -19,6 +19,27 @@ function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
 }
 
+//copy the $file to $dir2
+var copyFile = (file, dir2, new_name, callbackFunc) => {
+  //include the fs, path modules
+  var fs = require('fs');
+  var path = require('path');
+
+  //gets file name and adds it to dir2
+  var f = path.basename(file);
+  var source = fs.createReadStream(file);
+  var dest = fs.createWriteStream(path.resolve(dir2, new_name));
+
+  source.pipe(dest);
+  source.on('end', function() {
+    console.log('Succesfully copied');
+    callbackFunc();
+  });
+  source.on('error', function(err) {
+    console.log(err);
+  });
+};
+
 
 
 var server = http.createServer(function(request, response) {
@@ -108,11 +129,33 @@ var server = http.createServer(function(request, response) {
         console.log(fields);
         console.log(files);
         console.log(err);
-        response.writeHead(200, {
-          'content-type': 'text/plain'
+
+        // figure out what sample number it should be
+        fs.readdir('samples', (err, files_in_folder) => {
+          var howMany = files_in_folder.length;
+          var new_sample_id = 's' + howMany + '_' + files['upload'].name;
+          copyFile(files['upload'].path, 'samples', new_sample_id, () => {
+            console.log("wow ok something new here too");
+
+            let rawdata = fs.readFileSync('score.json');
+            let scoreJson = JSON.parse(rawdata);
+            scoreJson[new_sample_id] = {
+              "startTime": 0,
+              "volume": 0.01,
+              "pan": 0.5
+            }
+            console.log(scoreJson);
+            let data_to_write = JSON.stringify(scoreJson);
+            fs.writeFileSync('score.json', data_to_write);
+
+
+          })
+          response.writeHead(200, {
+            'content-type': 'text/plain'
+          });
+          response.write(new_sample_id);
+          response.end();
         });
-        response.write('s8');
-        response.end();
       });
     } else {
       response.writeHead(404, 'Resource Not Found', {

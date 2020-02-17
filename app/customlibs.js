@@ -4,7 +4,7 @@ function URLify(string) {
 
 
 function loadFile(fileName) {
-  var new_file = new Pizzicato.Sound('res/' + fileName + '.m4a', function() {
+  var new_file = new Pizzicato.Sound('samples/' + fileName, function() {
     // console.log("loaded " + fileName + "!");
     doParamsUpdate(fileName);
     allSoundFiles[fileName].et_sn = allSoundFiles[fileName].getRawSourceNode();
@@ -26,6 +26,9 @@ function showAll() {
   } else {
     x.style.display = "none";
   }
+    MASTER_GROUP.volume = 1;
+    IS_IN_MUTE = false;
+
 }
 
 async function postData(url = '', data = {}) {

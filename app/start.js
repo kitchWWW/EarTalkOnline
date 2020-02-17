@@ -14,11 +14,11 @@ window.onclick = function() {
 // set all your shit
 scoreAllSoundInstructions = {} // in future will be something we get, store, and refresh from server
 allSoundFiles = {}
-IS_IN_MUTE = false;
+IS_IN_MUTE = true; // start off muted;
 
 GLOBAL_TIMESTEP = 1000 / 20.0; // 13 frames a second, enough to fool eye in scrolling.
 GLOBAL_REFRESH = 1000; // how frequently we request a new score from the server
-TOTAL_LENGTH_OF_COMPOSITION = 2 * 1000; // 2 minutes
+TOTAL_LENGTH_OF_COMPOSITION = 20 * 1000; 
 ANIMATION_TIME_CURRENT = 0;
 
 var reverb = new Pizzicato.Effects.Reverb({
@@ -34,5 +34,6 @@ var SESSION_ID = 'id_' + Math.random().toString(36).substr(2, 18);
 
 // the valid final state of the dealio
 doInit();
+MASTER_GROUP.volume = 0;
 window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
 window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);

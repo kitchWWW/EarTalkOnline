@@ -75,11 +75,11 @@ function doMute() {
   if (IS_IN_MUTE) {
     MASTER_GROUP.volume = 1;
     IS_IN_MUTE = false
-    document.getElementById("myMuteButton").innerHTML = "MUTE!";
+    document.getElementById("myMuteButton").innerHTML = "mute";
   } else {
     MASTER_GROUP.volume = 0;
     IS_IN_MUTE = true
-    document.getElementById("myMuteButton").innerHTML = "play again";
+    document.getElementById("myMuteButton").innerHTML = "unmute";
   }
 }
 
