@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
+<body>
+
+<button id="go_all" onclick="goAll()">Start the whole thing</button>
+<br>
+<br>
+Instructions: <input type="text" id="myText" size="55" value="start the music!">
+<p>Type your instructions to the orchestra then press enter or this button below</p>
+<button id="myButton" onclick="myFunction()">Submit Instructions</button>
+
+<script>
+function URLify(string) {
+ return string.trim().replace(/\s/g, '%20');
+}
+
+allSampleNames = ['bass','stringstrem','winds','piano','stringsmelody']
+scoreAllSoundInstructions = [] // in future will be something we get, store, and refresh from server
+allSoundFiles = []
+function doInit(){
+  console.log(allSampleNames);
+  allSampleNames.forEach((fileName)=>{
+    var myNewObject = {}
+    myNewObject.startTime = 245;
+    myNewObject.volume = 1;
+    myNewObject.pan = .5;
+    loadFile(fileName)
+    scoreAllSoundInstructions[fileName] = myNewObject;
+    console.log(scoreAllSoundInstructions);
+  });
+}
+
+
+function loadFile(fileName){
+  var new_file = new Pizzicato.Sound('res/'+fileName+'.wav', function() {
+    console.log("loaded "+fileName+"!");
+    doParamsUpdate(fileName);
+  });
+  allSoundFiles[fileName] = new_file;
+  console.log(allSoundFiles);
+}
+
+function doParamsUpdate(fileName){
+    allSoundFiles[fileName].volume = scoreAllSoundInstructions[fileName].volume
+    allSoundFiles[fileName].pan = scoreAllSoundInstructions[fileName].pan  
+}
+function masterIntervalStepper(){
+  var time = 260;//get time
+  time = time % TOTAL_LENGTH_OF_COMPOSITION; // keep it within 0 -> total length
+  allSampleNames.forEach((fileName)=>{
+    scoreSampleInstruction = scoreAllSoundInstructions[fileName];
+    if(scoreSampleInstruction.startTime > time - GLOBAL_TIMESTEP && scoreSampleInstruction.startTime < time){
+      //
+    }else{
+      doParamsUpdate(fileName)
+    }
+  });
+  // also do a render update
+}
+
+
+// all the actually important shit.
+GLOBAL_TIMESTEP = 1000 / 13.0; // 13 frames a second, enough to fool eye in scrolling.
+TOTAL_LENGTH_OF_COMPOSITION = 2*1000; // 2 minutes
+doInit();
+window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
+
+
+// the stupid junk you have to do to get shit to work on mobile.
+window.onclick = function(){
+ let context = Pizzicato.context
+ let source = context.createBufferSource()
+ source.buffer = context.createBuffer(1, 1, 22050)
+ source.connect(context.destination)
+ source.start()
+}
+</script>
+   </body>
+</html>
