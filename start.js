@@ -19,14 +19,14 @@ window.onclick = function() {
 }
 
 // set all your shit
-allSampleNames = ['s1', 's2', 's3', 's4', 's5'] // everything we need to be worrying about
 scoreAllSoundInstructions = {} // in future will be something we get, store, and refresh from server
-allSoundFiles = []
+allSoundFiles = {}
 IS_IN_MUTE = false;
 
-GLOBAL_TIMESTEP = 1000 / 13.0; // 13 frames a second, enough to fool eye in scrolling.
+GLOBAL_TIMESTEP = 1000 / 20.0; // 13 frames a second, enough to fool eye in scrolling.
 GLOBAL_REFRESH = 1000; // how frequently we request a new score from the server
 TOTAL_LENGTH_OF_COMPOSITION = 2 * 1000; // 2 minutes
+ANIMATION_TIME_CURRENT = 0;
 
 var reverb = new Pizzicato.Effects.Reverb({
 	time: 0.5,
