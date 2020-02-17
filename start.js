@@ -1,13 +1,6 @@
 // all the shit that you have to actually execute
-
-// allows pressing "enter" on the text box to submit
-document.getElementById("myText")
-	.addEventListener("keyup", function(event) {
-		event.preventDefault();
-		if (event.keyCode === 13) {
-			document.getElementById("myButton").click();
-		}
-	});
+document.getElementById("allInteraction").style.display = "none";
+document.getElementById('fileUploadForm').addEventListener("submit", formSubmit);
 
 // the stupid junk you have to do to get pizz audio to work on mobile.
 window.onclick = function() {
@@ -38,8 +31,8 @@ var MASTER_GROUP = new Pizzicato.Group([]);
 MASTER_GROUP.addEffect(reverb);
 var SESSION_ID = 'id_' + Math.random().toString(36).substr(2, 18);
 
+
 // the valid final state of the dealio
 doInit();
 window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
 window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);
-document.getElementById("allInteraction").style.display = "none";

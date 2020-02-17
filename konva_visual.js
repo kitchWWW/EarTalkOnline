@@ -1,5 +1,5 @@
 var width = window.innerWidth;
-var height = window.innerHeight - 200;
+var height = window.innerHeight - 300;
 
 var stage = new Konva.Stage({
   container: 'container',
@@ -7,7 +7,7 @@ var stage = new Konva.Stage({
   height: height
 });
 
-SAMPLE_HEIGHT = 100;
+SAMPLE_HEIGHT = 50;
 CAN_DO_UPDATE = true;
 
 function doAnimationScoreUpdate() {

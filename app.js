@@ -1,4 +1,3 @@
-
 var http = require("http"),
   url = require("url"),
   path = require("path"),
@@ -62,15 +61,12 @@ var server = http.createServer(function(request, response) {
   }
 
   if (request.method === "POST") {
-
     var uri = url.parse(request.url).pathname,
       filename = path.join(process.cwd(), uri);
 
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
     serverLog(query.id);
-
-
     if (request.url.startsWith("/updateScore")) {
       var requestBody = '';
       request.on('data', function(data) {
@@ -88,11 +84,12 @@ var server = http.createServer(function(request, response) {
         console.log(data);
         let rawdata = fs.readFileSync('score.json');
         let scoreJson = JSON.parse(rawdata);
-        Object.keys(data.params_for_edit).forEach((name)=>{
+        Object.keys(data.params_for_edit).forEach((name) => {
           console.log(name);
           console.log(data.params_for_edit[name]);
-          if(typeof data.params_for_edit[name] == 'number')
-          scoreJson[data.sample_id][name] = data.params_for_edit[name];
+          if (typeof data.params_for_edit[name] == 'number') {
+            scoreJson[data.sample_id][name] = data.params_for_edit[name];
+          }
         });
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
@@ -104,6 +101,19 @@ var server = http.createServer(function(request, response) {
         response.end();
       });
 
+    } else if (request.url.startsWith("/upload")) {
+      // parse a file upload
+      var form = new formidable.IncomingForm();
+      form.parse(request, function(err, fields, files) {
+        console.log(fields);
+        console.log(files);
+        console.log(err);
+        response.writeHead(200, {
+          'content-type': 'text/plain'
+        });
+        response.write('s8');
+        response.end();
+      });
     } else {
       response.writeHead(404, 'Resource Not Found', {
         'Content-Type': 'text/html'

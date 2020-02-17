@@ -15,15 +15,15 @@
   <body>
     <button id="go_all" onclick="showAll()">Start the whole thing</button>
     <div id="allInteraction"> <!-- the thing we are going to hide-->
-
     <div id="container" style="border-style: solid; border-width: 5px;"></div>
     <br>
     <br>
-    Instructions: <input type="text" id="myText" size="55" value="start the music!">
-    <p>Type your instructions to the orchestra then press enter or this button below</p>
-    <button id="myButton" onclick="doInstructionExecution()">Submit Instructions</button>
-    <br><br>
     <button id="myMuteButton" onclick="doMute()">MUTE!</button>
+    <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post">
+      <input type="text" name="title"><br>
+      <input type="file" name="upload" required><br>
+      <input type="submit" value="Upload">
+    </form>
   </div>
   <script src="customlibs.js"></script>
   <script src="corelogic.js"></script>
