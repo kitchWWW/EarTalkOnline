@@ -22,31 +22,30 @@ function masterScoreRefresh() {
     .then(data => {
       var old_scoreAllSoundInstructions = scoreAllSoundInstructions
       scoreAllSoundInstructions = data;
-      if (!isEquivalent(scoreAllSoundInstructions, old_scoreAllSoundInstructions)) {}
+      if (!isEquivalent(scoreAllSoundInstructions, old_scoreAllSoundInstructions)) {
+        console.log("shit aint the same, need an update!");
+      }
+      doAnimationScoreUpdate();
     })
     .catch(e => {
       console.log(e);
       return e;
     });
-  doAnimationScoreUpdate();
 }
 
 var serverUpdateTimeout = null;
 
 function updateServerScore(sample_id, params_for_edit) {
+  console.log("doing update!");
+  console.log(sample_id);
+  console.log(params_for_edit);
   CAN_DO_UPDATE = false;
-  if (serverUpdateTimeout != null) {
-    clearTimeout(serverUpdateTimeout);
-  }
-  serverUpdateTimeout = setTimeout(function() {
-    CAN_DO_UPDATE = true;
-    serverUpdateTimeout = null
-  }, 2000);
-  postData('/updateScore', {
+  postData('/updateScore?id='+SESSION_ID, {
       sample_id: sample_id,
       params_for_edit: params_for_edit,
     })
     .then((data) => {
+      CAN_DO_UPDATE = true;
       console.log("DID THE UPDATE!");
       console.log(data); // JSON data parsed by `response.json()` call
     });

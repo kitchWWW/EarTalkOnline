@@ -42,3 +42,4 @@ var SESSION_ID = 'id_' + Math.random().toString(36).substr(2, 18);
 doInit();
 window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
 window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);
+document.getElementById("allInteraction").style.display = "none";

@@ -5,23 +5,28 @@ function URLify(string) {
 
 function loadFile(fileName) {
   var new_file = new Pizzicato.Sound('res/' + fileName + '.m4a', function() {
-    console.log("loaded " + fileName + "!");
+    // console.log("loaded " + fileName + "!");
     doParamsUpdate(fileName);
     allSoundFiles[fileName].et_sn = allSoundFiles[fileName].getRawSourceNode();
-    console.log(allSoundFiles[fileName]);
+    // console.log(allSoundFiles[fileName]);
     doAnimationScoreUpdate();
 
   });
   allSoundFiles[fileName] = new_file;
-  console.log(allSoundFiles);
+  // console.log(allSoundFiles);
   MASTER_GROUP.addSound(new_file);
 
 }
 
 function showAll() {
-  // do some div hiding and showing here
+  var x = document.getElementById("allInteraction");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+    document.getElementById("go_all").style.display = "none";
+  } else {
+    x.style.display = "none";
+  }
 }
-
 
 async function postData(url = '', data = {}) {
   // Default options are marked with *
@@ -61,7 +66,6 @@ function isEquivalent(a, b) {
       return false;
     }
   }
-
   // If we made it this far, objects
   // are considered equivalent
   return true;
