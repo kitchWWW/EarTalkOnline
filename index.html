@@ -15,9 +15,41 @@ function URLify(string) {
  return string.trim().replace(/\s/g, '%20');
 }
 
-allSampleNames = ['bass','stringstrem','winds','piano','stringsmelody']
+function myFunction() {
+ var res = document.getElementById("myText").value;
+ document.getElementById("myText").value = "";
+ console.log(res);
+  fetch("https://api.wit.ai/message?v=20200204&q="+URLify(res), {
+    headers: {
+      Authorization: "Bearer YRP5ROMET2FO3A54HYWB7R72VV6TRSF2"
+    }
+  })
+ .then(blob => blob.json())
+ .then(data => {
+   console.table(data);
+    var intent = ''
+    if(data.entities.intent){
+      intent = data.entities.intent[0].value
+    }
+    var instrument = ''
+    if(data.entities.instrument){
+      instrument = data.entities.instrument[0].value
+    }
+ })
+ .catch(e => {
+   console.log(e);
+   return e;
+ });
+}
+
+
+
+
+
+allSampleNames = ['bass','stringstrem','winds','piano','stringsmelody'] // everything we need to be worrying about
 scoreAllSoundInstructions = [] // in future will be something we get, store, and refresh from server
 allSoundFiles = []
+
 function doInit(){
   console.log(allSampleNames);
   allSampleNames.forEach((fileName)=>{
@@ -51,14 +83,12 @@ function masterIntervalStepper(){
   allSampleNames.forEach((fileName)=>{
     scoreSampleInstruction = scoreAllSoundInstructions[fileName];
     if(scoreSampleInstruction.startTime > time - GLOBAL_TIMESTEP && scoreSampleInstruction.startTime < time){
-      //
-    }else{
-      doParamsUpdate(fileName)
+      //tell the thing to start playing
     }
+    doParamsUpdate(fileName);
   });
   // also do a render update
 }
-
 
 // all the actually important shit.
 GLOBAL_TIMESTEP = 1000 / 13.0; // 13 frames a second, enough to fool eye in scrolling.
