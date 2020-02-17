@@ -1,110 +1,37 @@
 <!DOCTYPE html>
 <html>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
+<!-- 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+<script>
+var app = angular.module("myShoppingList", []); 
+app.controller("myCtrl", function($scope) {
+    $scope.IS_IN_MUTE = true;
+});
+</script> -->
+
 <body>
 
-<button id="go_all" onclick="goAll()">Start the whole thing</button>
+<button id="go_all" onclick="showAll()">Start the whole thing</button>
+<div id="allInteraction"> <!-- the thing we are going to hide-->
 <br>
 <br>
 Instructions: <input type="text" id="myText" size="55" value="start the music!">
 <p>Type your instructions to the orchestra then press enter or this button below</p>
-<button id="myButton" onclick="myFunction()">Submit Instructions</button>
+<button id="myButton" onclick="doInstructionExecution()">Submit Instructions</button>
+<br><br>
 
-<script>
-function URLify(string) {
- return string.trim().replace(/\s/g, '%20');
-}
-
-function myFunction() {
- var res = document.getElementById("myText").value;
- document.getElementById("myText").value = "";
- console.log(res);
-  fetch("https://api.wit.ai/message?v=20200204&q="+URLify(res), {
-    headers: {
-      Authorization: "Bearer YRP5ROMET2FO3A54HYWB7R72VV6TRSF2"
-    }
-  })
- .then(blob => blob.json())
- .then(data => {
-   console.table(data);
-    var intent = ''
-    if(data.entities.intent){
-      intent = data.entities.intent[0].value
-    }
-    var instrument = ''
-    if(data.entities.instrument){
-      instrument = data.entities.instrument[0].value
-    }
- })
- .catch(e => {
-   console.log(e);
-   return e;
- });
-}
-
-
-
-
-
-allSampleNames = ['bass','stringstrem','winds','piano','stringsmelody'] // everything we need to be worrying about
-scoreAllSoundInstructions = [] // in future will be something we get, store, and refresh from server
-allSoundFiles = []
-
-function doInit(){
-  console.log(allSampleNames);
-  allSampleNames.forEach((fileName)=>{
-    var myNewObject = {}
-    myNewObject.startTime = 245;
-    myNewObject.volume = 1;
-    myNewObject.pan = .5;
-    loadFile(fileName)
-    scoreAllSoundInstructions[fileName] = myNewObject;
-    console.log(scoreAllSoundInstructions);
-  });
-}
-
-
-function loadFile(fileName){
-  var new_file = new Pizzicato.Sound('res/'+fileName+'.wav', function() {
-    console.log("loaded "+fileName+"!");
-    doParamsUpdate(fileName);
-  });
-  allSoundFiles[fileName] = new_file;
-  console.log(allSoundFiles);
-}
-
-function doParamsUpdate(fileName){
-    allSoundFiles[fileName].volume = scoreAllSoundInstructions[fileName].volume
-    allSoundFiles[fileName].pan = scoreAllSoundInstructions[fileName].pan  
-}
-function masterIntervalStepper(){
-  var time = 260;//get time
-  time = time % TOTAL_LENGTH_OF_COMPOSITION; // keep it within 0 -> total length
-  allSampleNames.forEach((fileName)=>{
-    scoreSampleInstruction = scoreAllSoundInstructions[fileName];
-    if(scoreSampleInstruction.startTime > time - GLOBAL_TIMESTEP && scoreSampleInstruction.startTime < time){
-      //tell the thing to start playing
-    }
-    doParamsUpdate(fileName);
-  });
-  // also do a render update
-}
-
-// all the actually important shit.
-GLOBAL_TIMESTEP = 1000 / 13.0; // 13 frames a second, enough to fool eye in scrolling.
-TOTAL_LENGTH_OF_COMPOSITION = 2*1000; // 2 minutes
-doInit();
-window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
-
-
-// the stupid junk you have to do to get shit to work on mobile.
-window.onclick = function(){
- let context = Pizzicato.context
- let source = context.createBufferSource()
- source.buffer = context.createBuffer(1, 1, 22050)
- source.connect(context.destination)
- source.start()
-}
-</script>
-   </body>
+<button id="myMuteButton" onclick="doMute()">MUTE!</button>
+</div>
+<script src="customlibs.js"></script>
+<script src="corelogic.js"></script>
+<script src="start.js"></script>
+<script src="NoSleep.js"></script>
+</body>
 </html>
+
+
+
+
+
