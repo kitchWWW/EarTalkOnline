@@ -17,33 +17,37 @@ function masterIntervalStepper() {
 }
 
 function masterScoreRefresh() {
-  console.log("calling score refresh");
   fetch("/score.json?id=" + SESSION_ID)
     .then(blob => blob.json())
     .then(data => {
       var old_scoreAllSoundInstructions = scoreAllSoundInstructions
       scoreAllSoundInstructions = data;
-      if (!isEquivalent(scoreAllSoundInstructions, old_scoreAllSoundInstructions)) {
-        console.log("CALLED!");
-        console.log(scoreAllSoundInstructions);
-        console.log(old_scoreAllSoundInstructions);
-        doAnimationScoreUpdate();
-      }
-      console.log(scoreAllSoundInstructions);
+      if (!isEquivalent(scoreAllSoundInstructions, old_scoreAllSoundInstructions)) {}
     })
     .catch(e => {
       console.log(e);
       return e;
     });
+  doAnimationScoreUpdate();
 }
 
-function updateServerScore(sample_id, param_to_edit, new_param_value) {
+var serverUpdateTimeout = null;
+
+function updateServerScore(sample_id, params_for_edit) {
+  CAN_DO_UPDATE = false;
+  if (serverUpdateTimeout != null) {
+    clearTimeout(serverUpdateTimeout);
+  }
+  serverUpdateTimeout = setTimeout(function() {
+    CAN_DO_UPDATE = true;
+    serverUpdateTimeout = null
+  }, 2000);
   postData('/updateScore', {
       sample_id: sample_id,
-      param_to_edit: param_to_edit,
-      new_param_value: new_param_value,
+      params_for_edit: params_for_edit,
     })
     .then((data) => {
+      console.log("DID THE UPDATE!");
       console.log(data); // JSON data parsed by `response.json()` call
     });
 }
@@ -60,27 +64,6 @@ function doInstructionExecution() {
       curSampleID = fileName
     }
   })
-  // fetch("https://api.wit.ai/message?v=20200204&q=" + URLify(res), {
-  //     headers: {
-  //       Authorization: "Bearer YRP5ROMET2FO3A54HYWB7R72VV6TRSF2"
-  //     }
-  //   })
-  //   .then(blob => blob.json())
-  //   .then(data => {
-  //     console.table(data);
-  //     var intent = ''
-  //     if (data.entities.intent) {
-  //       intent = data.entities.intent[0].value
-  //     }
-  //     var instrument = ''
-  //     if (data.entities.instrument) {
-  //       instrument = data.entities.instrument[0].value
-  //     }
-  //   })
-  //   .catch(e => {
-  //     console.log(e);
-  //     return e;
-  //   });
 }
 
 

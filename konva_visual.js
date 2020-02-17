@@ -8,21 +8,24 @@ var stage = new Konva.Stage({
 });
 
 SAMPLE_HEIGHT = 100;
+CAN_DO_UPDATE = true;
 
 function doAnimationScoreUpdate() {
-  console.log("we are here bro");
+  if (!CAN_DO_UPDATE) {
+    return;
+  }
   sampleCounts = 0
   stage.destroyChildren();
   Object.keys(scoreAllSoundInstructions).forEach((fileName) => {
     var x_start = Math.floor((scoreAllSoundInstructions[fileName].startTime * width) / TOTAL_LENGTH_OF_COMPOSITION);
-    var y_start = (SAMPLE_HEIGHT * sampleCounts);
+    var y_start = (1 - scoreAllSoundInstructions[fileName].volume) * (height - SAMPLE_HEIGHT)
     var sn = allSoundFiles[fileName].et_sn;
-
+    if (sn == undefined) {
+      return;
+    }
     var rec_width = sn.buffer.duration * 1000 * width / TOTAL_LENGTH_OF_COMPOSITION
 
     var layer = new Konva.Layer();
-    var rectX = stage.width() / 2 - 50;
-    var rectY = stage.height() / 2 - 25;
     var box = new Konva.Rect({
       x: x_start,
       y: y_start,
@@ -40,8 +43,7 @@ function doAnimationScoreUpdate() {
       document.body.style.cursor = 'pointer';
     });
     box.on('mouseup', function() {
-      console.log(box.et_name);
-      console.log(box.attrs.x)
+      CAN_DO_UPDATE = true;
       if (box.attrs.x < 0) {
         box.move({
           x: -box.attrs.x,
@@ -50,13 +52,21 @@ function doAnimationScoreUpdate() {
       }
       // new thing:
       var new_start_time = box.attrs.x * TOTAL_LENGTH_OF_COMPOSITION / width;
-      console.log(new_start_time);
-      updateServerScore(box.et_name,'startTime',new_start_time);
+      var new_volume = 1 - (box.attrs.y / (height - SAMPLE_HEIGHT));
+      console.log(new_volume);
+      updateServerScore(box.et_name, {
+        'startTime': new_start_time,
+        'volume': new_volume,
+      });
     });
+    box.on('mousedown', function() {
+      CAN_DO_UPDATE = false;
+    })
     box.on('mouseout', function() {
       document.body.style.cursor = 'default';
     });
     layer.add(box);
     stage.add(layer);
+
   });
 }

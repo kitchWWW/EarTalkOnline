@@ -130,11 +130,20 @@ var server = http.createServer(function(request, response) {
         console.log(data);
         let rawdata = fs.readFileSync('score.json');
         let scoreJson = JSON.parse(rawdata);
-        scoreJson[data.sample_id][data.param_to_edit] = data.new_param_value;
+        Object.keys(data.params_for_edit).forEach((name)=>{
+          console.log(name);
+          console.log(data.params_for_edit[name]);
+          scoreJson[data.sample_id][name] = data.params_for_edit[name];
+        });
         let data_to_write = JSON.stringify(scoreJson);
         fs.writeFileSync('score.json', data_to_write);
+        response.writeHead(200, {
+          "Content-Type": "text/plain"
+        });
+        response.write(data_to_write);
+        response.end();
       });
-      
+
     } else {
       response.writeHead(404, 'Resource Not Found', {
         'Content-Type': 'text/html'
@@ -149,5 +158,6 @@ server.on('error', function(e) {
   // Handle your error here
   console.log(e);
 });
+server.timeout = 1000;
 
 console.log("Server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
