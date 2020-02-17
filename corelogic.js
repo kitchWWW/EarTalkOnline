@@ -17,15 +17,6 @@ function masterScoreRefresh() {
     .then(blob => blob.json())
     .then(data => {
       scoreAllSoundInstructions = data;
-      postData('/updateScore', {
-          sample_id: 's1',
-          param_to_edit: 'volume',
-          new_param_value: 1
-        })
-        .then((data) => {
-          console.log(data); // JSON data parsed by `response.json()` call
-        });
-
     })
     .catch(e => {
       console.log(e);
@@ -33,6 +24,16 @@ function masterScoreRefresh() {
     });
 }
 
+function updateServerScore(sample_id, param_to_edit, new_param_value) {
+  postData('/updateScore', {
+      sample_id: sample_id,
+      param_to_edit: param_to_edit,
+      new_param_value: new_param_value,
+    })
+    .then((data) => {
+      console.log(data); // JSON data parsed by `response.json()` call
+    });
+}
 
 function doInstructionExecution() {
   var res = document.getElementById("myText").value;

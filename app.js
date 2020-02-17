@@ -125,15 +125,16 @@ var server = http.createServer(function(request, response) {
         }
       });
       request.on('end', function() {
+        // should probably do something to make sure this is an atomic function.
         var data = JSON.parse(requestBody);
         console.log(data);
-        console.log(data.sample_id);
-        console.log(data.param_to_edit);
-        console.log(data.new_param_value);
         let rawdata = fs.readFileSync('score.json');
         let scoreJson = JSON.parse(rawdata);
-        console.log(scoreJson);
+        scoreJson[data.sample_id][data.param_to_edit] = data.new_param_value;
+        let data_to_write = JSON.stringify(scoreJson);
+        fs.writeFileSync('score.json', data_to_write);
       });
+      
     } else {
       response.writeHead(404, 'Resource Not Found', {
         'Content-Type': 'text/html'
