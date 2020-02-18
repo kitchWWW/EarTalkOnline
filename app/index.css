@@ -1,0 +1,18 @@
+.column {
+  float: left;
+  width: 50%;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+div.ex3 {
+  background-color: lightblue;
+  width: 100%;
+  height: 110px;
+  overflow: auto;
+}

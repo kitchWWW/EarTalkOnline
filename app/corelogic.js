@@ -17,6 +17,7 @@ function masterIntervalStepper() {
 }
 
 function masterScoreRefresh() {
+  updateSessionID();
   fetch("/score.json?id=" + SESSION_ID)
     .then(blob => blob.json())
     .then(data => {
@@ -36,6 +37,7 @@ function masterScoreRefresh() {
 var serverUpdateTimeout = null;
 
 function updateServerScore(sample_id, params_for_edit) {
+  updateSessionID();
   console.log("doing update!");
   console.log(sample_id);
   console.log(params_for_edit);
@@ -50,21 +52,6 @@ function updateServerScore(sample_id, params_for_edit) {
       console.log(data); // JSON data parsed by `response.json()` call
     });
 }
-
-function doInstructionExecution() {
-  var res = document.getElementById("myText").value;
-  document.getElementById("myText").value = "";
-  res = res.toLowerCase();
-  console.log(res);
-  curSampleID = ''
-  Object.keys(scoreAllSoundInstructions).forEach((fileName) => {
-    fileName = fileName.toLowerCase();
-    if (res.includes(fileName)) {
-      curSampleID = fileName
-    }
-  })
-}
-
 
 function doParamsUpdate(fileName) {
   allSoundFiles[fileName].volume = scoreAllSoundInstructions[fileName].volume

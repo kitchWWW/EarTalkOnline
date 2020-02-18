@@ -29,8 +29,9 @@ var reverb = new Pizzicato.Effects.Reverb({
 });
 var MASTER_GROUP = new Pizzicato.Group([]);
 MASTER_GROUP.addEffect(reverb);
-var SESSION_ID = 'id_' + Math.random().toString(36).substr(2, 18);
-
+var ORIG_SESSION_ID = 'id_' + Math.random().toString(36).substr(2, 18);
+var SESSION_ID = '';
+updateSessionID();
 
 // the valid final state of the dealio
 doInit();

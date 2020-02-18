@@ -3,6 +3,7 @@
   <head>
     <script src="https://unpkg.com/konva@4.1.5/konva.min.js"></script>
     <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="index.css">
     <style>
     body {
     margin: 0;
@@ -17,12 +18,22 @@
     <div id="allInteraction"> <!-- the thing we are going to hide-->
     <div id="container" style="border-style: solid; border-width: 5px;"></div>
     <br>
-    <br>
-    <button id="myMuteButton" onclick="doMute()">MUTE!</button>
-    <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post">
-      <input type="file" name="upload" required><br>
-      <input type="submit" value="Upload">
-    </form>
+    <div class="row">
+      <div class="column">
+        <button id="myMuteButton" onclick="doMute()">MUTE!</button>
+        <br><br>
+        <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post">
+          <input type="file" name="upload" required><br>
+          <input type="submit" value="Upload">
+        </form>
+      </div>
+      <div class="column">history:<br><br>
+        <div class="ex3">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+        </div>
+        <br>
+        <input type="text" id="fname" name="fname"><br>
+      </div>
+    </div>
   </div>
   <script src="customlibs.js"></script>
   <script src="corelogic.js"></script>

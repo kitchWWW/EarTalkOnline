@@ -50,6 +50,17 @@ async function postData(url = '', data = {}) {
 }
 
 
+function updateSessionID(){
+  SESSION_ID = ORIG_SESSION_ID;
+  var user_name= document.getElementById("fname").value;
+  if(user_name == "" || user_name == null || user_name == undefined){
+    user_name = 'Anon';
+  }
+  SESSION_ID = SESSION_ID+'=|=|=|=|='+user_name;
+}
+
+
+
 function isEquivalent(a, b) {
   // Create arrays of property names
   var aProps = Object.getOwnPropertyNames(a);

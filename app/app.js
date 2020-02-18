@@ -13,12 +13,25 @@ String.prototype.replaceAll = function(search, replacement) {
   return target.split(search).join(replacement);
 };
 
-fs.writeFile("server.log", "Starting Log...", function(err) {});
+fs.writeFile("server.log", "Starting Log...\n", function(err) {});
 
 function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
 }
 
+function writeToHistory(user,sample,action){
+  var bits = user.split("=|=|=|=|=");
+  var actionLog = '***'+Date.now()+' - '+bits[1]+" "+action+" "+sample+"\n";
+  console.log(actionLog);
+  fs.appendFile("server.log", actionLog, function(err) {});
+}
+
+function stripName(id){
+  if(id){
+    return id.split("=|=|=|=|=")[0];    
+  }
+  return "none";
+}
 //copy the $file to $dir2
 var copyFile = (file, dir2, new_name, callbackFunc) => {
   //include the fs, path modules
@@ -51,7 +64,7 @@ var server = http.createServer(function(request, response) {
 
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
-    serverLog(query.id);
+    serverLog(stripName(query.id));
 
     fs.exists(filename, function(exists) {
       if (!exists) {
@@ -87,7 +100,7 @@ var server = http.createServer(function(request, response) {
 
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
-    serverLog(query.id);
+    serverLog(stripName(query.id));
     if (request.url.startsWith("/updateScore")) {
       var requestBody = '';
       request.on('data', function(data) {
@@ -114,6 +127,9 @@ var server = http.createServer(function(request, response) {
         });
         if(Object.keys(data.params_for_edit).length < 1){
           delete scoreJson[data.sample_id];
+          writeToHistory(query.id,data.sample_id,'deleted');
+        }else{
+          writeToHistory(query.id,data.sample_id,'moved');
         }
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
