@@ -6,6 +6,29 @@ var stage = new Konva.Stage({
   width: width,
   height: height
 });
+var samples_layer = new Konva.Layer();
+var trash_layer = new Konva.Layer();
+
+
+
+// main API:
+var imageObj = new Image();
+imageObj.onload = function() {
+  var yoda = new Konva.Image({
+    x: width - 55,
+    y: height - 55,
+    image: imageObj,
+    width: 50,
+    height: 50,
+  });
+
+  // add the shape to the layer
+  trash_layer.add(yoda);
+  trash_layer.batchDraw();
+};
+imageObj.src = '/res/trash.png';
+stage.add(trash_layer);
+
 
 SAMPLE_HEIGHT = 50;
 CAN_DO_UPDATE = true;
@@ -17,12 +40,11 @@ function doAnimationScoreUpdate() {
     return;
   }
   sampleCounts = 0
-  stage.destroyChildren();
-  var layer = new Konva.Layer();
+  samples_layer.destroyChildren();
   Object.keys(scoreAllSoundInstructions).forEach((fileName) => {
     var x_start = Math.floor((scoreAllSoundInstructions[fileName].startTime * width) / TOTAL_LENGTH_OF_COMPOSITION);
     var y_start = (1 - scoreAllSoundInstructions[fileName].volume) * (height - SAMPLE_HEIGHT)
-    if(allSoundFiles[fileName] == undefined){
+    if (allSoundFiles[fileName] == undefined) {
       return;
     }
     var sn = allSoundFiles[fileName].et_sn;
@@ -59,8 +81,21 @@ function doAnimationScoreUpdate() {
 
     var myUpdateFunction = function(e) {
       console.log("start:");
-      console.log(e.target.x());
-      console.log(group.attrs.x);
+      console.log();
+      if (e.evt.layerX > width - 50) {
+        if (e.evt.layerY > height - 50) {
+          // then they went to the delete button!
+          console.log("delete!");
+          updateServerScore(group.et_name, {});
+          group.destroy();
+
+          return;
+        }
+      }
+
+      // console.log(e.target.x());
+      // console.log(group.attrs.x);
+
       var box_x = e.target.x() + group.attrs.x
       var box_y = e.target.y() + group.attrs.y
       console.log(box_x);
@@ -80,11 +115,13 @@ function doAnimationScoreUpdate() {
       // new thing:
       var new_start_time = box_x * TOTAL_LENGTH_OF_COMPOSITION / width;
       var new_volume = 1 - (box_y / (height - SAMPLE_HEIGHT));
-      if(new_start_time < 0){
+      if (new_start_time < 0) {
         new_start_time = 0;
-      }if(new_volume < 0){
+      }
+      if (new_volume < 0) {
         new_volume = 0;
-      }if(new_volume > 1){
+      }
+      if (new_volume > 1) {
         new_volume = 1;
       }
       updateServerScore(group.et_name, {
@@ -98,7 +135,7 @@ function doAnimationScoreUpdate() {
       document.body.style.cursor = 'pointer';
     });
     group.on('mouseup', myUpdateFunction);
-    group.on('touchend',myUpdateFunction);
+    group.on('touchend', myUpdateFunction);
     group.on('mousedown', function() {
       CAN_DO_UPDATE = false;
     })
@@ -108,7 +145,10 @@ function doAnimationScoreUpdate() {
     group.on('mouseout', function() {
       document.body.style.cursor = 'default';
     });
-    layer.add(group);
+    samples_layer.add(group);
   });
-  stage.add(layer);
+
+  stage.add(samples_layer);
+
+
 }

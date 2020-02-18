@@ -112,6 +112,9 @@ var server = http.createServer(function(request, response) {
             scoreJson[data.sample_id][name] = data.params_for_edit[name];
           }
         });
+        if(Object.keys(data.params_for_edit).length < 1){
+          delete scoreJson[data.sample_id];
+        }
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
         fs.writeFileSync('score.json', data_to_write);
