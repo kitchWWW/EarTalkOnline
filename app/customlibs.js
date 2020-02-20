@@ -19,16 +19,11 @@ function loadFile(fileName) {
 }
 
 function showAll() {
-  var x = document.getElementById("allInteraction");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-    document.getElementById("go_all").style.display = "none";
-  } else {
-    x.style.display = "none";
-  }
-    MASTER_GROUP.volume = 1;
-    IS_IN_MUTE = false;
-
+  document.getElementById("allInteraction").style.display = "block";
+  document.getElementById("intro_page").style.display = "none";
+  MASTER_GROUP.volume = 1;
+  IS_IN_MUTE = false;
+  document.getElementById("fname").value = document.getElementById("cname").value
 }
 
 async function postData(url = '', data = {}) {
@@ -50,13 +45,13 @@ async function postData(url = '', data = {}) {
 }
 
 
-function updateSessionID(){
+function updateSessionID() {
   SESSION_ID = ORIG_SESSION_ID;
-  var user_name= document.getElementById("fname").value;
-  if(user_name == "" || user_name == null || user_name == undefined){
+  var user_name = document.getElementById("fname").value;
+  if (user_name == "" || user_name == null || user_name == undefined) {
     user_name = 'Anon';
   }
-  SESSION_ID = SESSION_ID+'=|=|=|=|='+user_name;
+  SESSION_ID = SESSION_ID + '=|=|=|=|=' + user_name;
 }
 
 
@@ -92,7 +87,7 @@ function formSubmit(event) {
   var request = new XMLHttpRequest();
   request.open('POST', url, true);
   request.onload = function() { // request successful
-  // we can use server response to our request now
+    // we can use server response to our request now
     console.log(request.responseText);
   };
 

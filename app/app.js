@@ -20,7 +20,11 @@ function serverLog(data) {
 }
 
 function writeToHistory(user,sample,action){
-  var bits = user.split("=|=|=|=|=");
+  if(user){
+    var bits = user.split("=|=|=|=|=");
+  }else{
+    bits = ['','Anon'];
+  }
   var actionLog = '***'+Date.now()+' - '+bits[1]+" "+action+" "+sample+"\n";
   console.log(actionLog);
   fs.appendFile("server.log", actionLog, function(err) {});
@@ -166,8 +170,7 @@ var server = http.createServer(function(request, response) {
             console.log(scoreJson);
             let data_to_write = JSON.stringify(scoreJson);
             fs.writeFileSync('score.json', data_to_write);
-
-
+            writeToHistory(query.id,new_sample_id,'uploaded');
           })
           response.writeHead(200, {
             'content-type': 'text/plain'

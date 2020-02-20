@@ -30,7 +30,7 @@ imageObj.src = '/res/trash.png';
 stage.add(trash_layer);
 
 
-SAMPLE_HEIGHT = 50;
+SAMPLE_HEIGHT = 30;
 CAN_DO_UPDATE = true;
 
 function doAnimationScoreUpdate() {
@@ -66,7 +66,7 @@ function doAnimationScoreUpdate() {
       x: x_start + 5,
       y: y_start + 5,
       text: fileName,
-      fontSize: 30,
+      fontSize: 20,
       fontFamily: 'arial',
       fill: 'black'
     });
@@ -139,7 +139,7 @@ function doAnimationScoreUpdate() {
     group.on('mousedown', function() {
       CAN_DO_UPDATE = false;
     })
-    group.on('touchdown', function() {
+    group.on('touchstart', function() {
       CAN_DO_UPDATE = false;
     })
     group.on('mouseout', function() {

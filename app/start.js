@@ -1,5 +1,4 @@
 // all the shit that you have to actually execute
-document.getElementById("allInteraction").style.display = "none";
 document.getElementById('fileUploadForm').addEventListener("submit", formSubmit);
 
 // the stupid junk you have to do to get pizz audio to work on mobile.
@@ -20,6 +19,7 @@ GLOBAL_TIMESTEP = 1000 / 20.0; // 13 frames a second, enough to fool eye in scro
 GLOBAL_REFRESH = 1000; // how frequently we request a new score from the server
 TOTAL_LENGTH_OF_COMPOSITION = 20 * 1000; 
 ANIMATION_TIME_CURRENT = 0;
+IS_FIRST_TIME_LOADING_CHAT = true;
 
 var reverb = new Pizzicato.Effects.Reverb({
 	time: 0.5,

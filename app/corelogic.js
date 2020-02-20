@@ -32,6 +32,23 @@ function masterScoreRefresh() {
       console.log(e);
       return e;
     });
+
+
+
+  fetch("/server.log?id=" + SESSION_ID)
+    .then(function(response) {
+      return response.text();
+    }).then(function(data) {
+      oldDisplayData = displayData;
+      var regex  = /\*\*\*/gi;
+      var displayData = data.replace(regex, "<br />***");
+      document.getElementById("history_chat").innerHTML = ""+displayData;
+      if(IS_FIRST_TIME_LOADING_CHAT){
+        var objDiv = document.getElementById("history_chat");
+        objDiv.scrollTop = objDiv.scrollHeight;
+        IS_FIRST_TIME_LOADING_CHAT = false;
+      }
+    });
 }
 
 var serverUpdateTimeout = null;
@@ -42,7 +59,7 @@ function updateServerScore(sample_id, params_for_edit) {
   console.log(sample_id);
   console.log(params_for_edit);
   CAN_DO_UPDATE = false;
-  postData('/updateScore?id='+SESSION_ID, {
+  postData('/updateScore?id=' + SESSION_ID, {
       sample_id: sample_id,
       params_for_edit: params_for_edit,
     })
