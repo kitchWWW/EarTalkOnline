@@ -1,5 +1,7 @@
 // all the shit that you have to actually execute
-document.getElementById('fileUploadForm').addEventListener("submit", formSubmit);
+document.getElementById("file").onchange = function() {
+	formSubmit();
+};
 
 // the stupid junk you have to do to get pizz audio to work on mobile.
 window.onclick = function() {
@@ -38,3 +40,4 @@ doInit();
 MASTER_GROUP.volume = 0;
 window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
 window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);
+

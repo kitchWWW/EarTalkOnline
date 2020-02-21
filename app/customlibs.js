@@ -82,7 +82,7 @@ function isEquivalent(a, b) {
 
 
 
-function formSubmit(event) {
+function formSubmit() {
   var url = "/upload";
   var request = new XMLHttpRequest();
   request.open('POST', url, true);
@@ -95,6 +95,5 @@ function formSubmit(event) {
     // request failed
   };
 
-  request.send(new FormData(event.target)); // create FormData from form that triggered event
-  event.preventDefault();
+  request.send(new FormData(document.getElementById('fileUploadForm'))); // create FormData from form that triggered event
 }
