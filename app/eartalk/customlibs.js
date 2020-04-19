@@ -1,10 +1,13 @@
+const URL_PREFIX = 'eartalk/'
+
+
 function URLify(string) {
   return string.trim().replace(/\s/g, '%20');
 }
 
 
 function loadFile(fileName) {
-  var new_file = new Pizzicato.Sound('samples/' + fileName, function() {
+  var new_file = new Pizzicato.Sound(URL_PREFIX+'samples/' + fileName, function() {
     // console.log("loaded " + fileName + "!");
     doParamsUpdate(fileName);
     allSoundFiles[fileName].et_sn = allSoundFiles[fileName].getRawSourceNode();
@@ -80,10 +83,17 @@ function isEquivalent(a, b) {
   return true;
 }
 
-
-
 function formSubmit() {
-  var url = "/upload";
+  var fd = new FormData(document.getElementById('fileUploadForm'));
+  console.log(fd);
+  sendFDtoServer(fd);
+}
+
+
+function sendFDtoServer(fd) {
+    updateSessionID();
+
+  var url = "/eartalkUpload?id=" + SESSION_ID;
   var request = new XMLHttpRequest();
   request.open('POST', url, true);
   request.onload = function() { // request successful
@@ -94,6 +104,47 @@ function formSubmit() {
   request.onerror = function() {
     // request failed
   };
+  request.send(fd); // create FormData from form that triggered event
 
-  request.send(new FormData(document.getElementById('fileUploadForm'))); // create FormData from form that triggered event
 }
+
+
+const recordAudio = () => {
+  return new Promise(resolve => {
+    navigator.mediaDevices.getUserMedia({
+        audio: true
+      })
+      .then(stream => {
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+
+        mediaRecorder.addEventListener("dataavailable", event => {
+          audioChunks.push(event.data);
+        });
+
+        const start = () => {
+          mediaRecorder.start();
+        };
+
+        const stop = () => {
+          return new Promise(resolve => {
+            mediaRecorder.addEventListener("stop", () => {
+              const audioBlob = new Blob(audioChunks);
+              var fd = new FormData();
+              fd.append('fname', 'test.wav');
+              fd.append('upload', audioBlob);
+              sendFDtoServer(fd);
+              resolve({
+                audioBlob,
+              });
+            });
+            mediaRecorder.stop();
+          });
+        };
+        resolve({
+          start,
+          stop
+        });
+      });
+  });
+};

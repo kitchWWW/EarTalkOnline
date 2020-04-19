@@ -13,7 +13,7 @@ String.prototype.replaceAll = function(search, replacement) {
   return target.split(search).join(replacement);
 };
 
-fs.writeFile("server.log", "Starting Log...\n", function(err) {});
+fs.writeFile("eartalk/server.log", "Starting Log...\n", function(err) {});
 
 function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
@@ -27,7 +27,7 @@ function writeToHistory(user,sample,action){
   }
   var actionLog = '***'+Date.now()+' - '+bits[1]+" "+action+" "+sample+"\n";
   console.log(actionLog);
-  fs.appendFile("server.log", actionLog, function(err) {});
+  fs.appendFile("eartalk/server.log", actionLog, function(err) {});
 }
 
 function stripName(id){
@@ -36,6 +36,15 @@ function stripName(id){
   }
   return "none";
 }
+
+
+function getName(id){
+  if(id){
+    return id.split("=|=|=|=|=")[1];    
+  }
+  return "Anon";
+}
+
 //copy the $file to $dir2
 var copyFile = (file, dir2, new_name, callbackFunc) => {
   //include the fs, path modules
@@ -120,7 +129,7 @@ var server = http.createServer(function(request, response) {
         // should probably do something to make sure this is an atomic function.
         var data = JSON.parse(requestBody);
         console.log(data);
-        let rawdata = fs.readFileSync('score.json');
+        let rawdata = fs.readFileSync('eartalk/score.json');
         let scoreJson = JSON.parse(rawdata);
         Object.keys(data.params_for_edit).forEach((name) => {
           console.log(name);
@@ -137,7 +146,7 @@ var server = http.createServer(function(request, response) {
         }
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
-        fs.writeFileSync('score.json', data_to_write);
+        fs.writeFileSync('eartalk/score.json', data_to_write);
         response.writeHead(200, {
           "Content-Type": "text/plain"
         });
@@ -145,7 +154,7 @@ var server = http.createServer(function(request, response) {
         response.end();
       });
 
-    } else if (request.url.startsWith("/upload")) {
+    } else if (request.url.startsWith("/eartalkUpload")) {
       // parse a file upload
       var form = new formidable.IncomingForm();
       form.parse(request, function(err, fields, files) {
@@ -154,13 +163,17 @@ var server = http.createServer(function(request, response) {
         console.log(err);
 
         // figure out what sample number it should be
-        fs.readdir('samples', (err, files_in_folder) => {
+        fs.readdir('eartalk/samples', (err, files_in_folder) => {
           var howMany = files_in_folder.length;
-          var new_sample_id = 's' + howMany + '_' + files['upload'].name;
-          copyFile(files['upload'].path, 'samples', new_sample_id, () => {
+          var name_to_use = files['upload'].name;
+          if(name_to_use == 'blob'){
+            name_to_use = getName(query.id);
+          }
+          var new_sample_id = 's' + howMany + '_' + name_to_use;
+          copyFile(files['upload'].path, 'eartalk/samples', new_sample_id, () => {
             console.log("wow ok something new here too");
 
-            let rawdata = fs.readFileSync('score.json');
+            let rawdata = fs.readFileSync('eartalk/score.json');
             let scoreJson = JSON.parse(rawdata);
             scoreJson[new_sample_id] = {
               "startTime": 0,
@@ -169,8 +182,34 @@ var server = http.createServer(function(request, response) {
             }
             console.log(scoreJson);
             let data_to_write = JSON.stringify(scoreJson);
-            fs.writeFileSync('score.json', data_to_write);
+            fs.writeFileSync('eartalk/score.json', data_to_write);
             writeToHistory(query.id,new_sample_id,'uploaded');
+          })
+          response.writeHead(200, {
+            'content-type': 'text/plain'
+          });
+          response.write(new_sample_id);
+          response.end();
+        });
+      });
+    } else if (request.url.startsWith("/handsUpload")) {
+      // parse a file upload
+      var form = new formidable.IncomingForm();
+      form.parse(request, function(err, fields, files) {
+        console.log(fields);
+        console.log(files);
+        console.log(err);
+
+        // figure out what sample number it should be
+        fs.readdir('hands/samples', (err, files_in_folder) => {
+          var howMany = files_in_folder.length;
+          var name_to_use = files['upload'].name;
+          if(name_to_use == 'blob'){
+            name_to_use = getName(query.id);
+          }
+          var new_sample_id = 's' + howMany + '_' + name_to_use+'.wav';
+          copyFile(files['upload'].path, 'hands/samples', new_sample_id, () => {
+            console.log("wow ok something new here too");
           })
           response.writeHead(200, {
             'content-type': 'text/plain'

@@ -1,7 +1,14 @@
 // all the shit that you have to actually execute
-document.getElementById("file").onchange = function() {
+document.getElementById("fileUploadForm").onchange = function() {
 	formSubmit();
 };
+document.getElementById("cname")
+    .addEventListener("keyup", function(event) {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+        document.getElementById("go_all").click();
+    }
+});
 
 // the stupid junk you have to do to get pizz audio to work on mobile.
 window.onclick = function() {
@@ -10,6 +17,7 @@ window.onclick = function() {
 	source.buffer = context.createBuffer(1, 1, 22050)
 	source.connect(context.destination)
 	source.start()
+	var noSleep = new NoSleep();
 }
 
 // set all your shit
@@ -22,6 +30,7 @@ GLOBAL_REFRESH = 1000; // how frequently we request a new score from the server
 TOTAL_LENGTH_OF_COMPOSITION = 20 * 1000; 
 ANIMATION_TIME_CURRENT = 0;
 IS_FIRST_TIME_LOADING_CHAT = true;
+var recorder = null;
 
 var reverb = new Pizzicato.Effects.Reverb({
 	time: 0.5,
