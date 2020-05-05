@@ -15,3 +15,13 @@ div.ex3 {
   color: black;
   text-align: center;
 }
+
+h3{
+  color:#404040;
+}
+
+.customwidth{
+  width:500px;
+  margin: auto;
+
+}

@@ -13,34 +13,34 @@ String.prototype.replaceAll = function(search, replacement) {
   return target.split(search).join(replacement);
 };
 
-fs.writeFile("eartalk/server.log", "Starting Log...\n", function(err) {});
+fs.writeFile("server.log", "Starting Log...\n", function(err) {});
 
 function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
 }
 
-function writeToHistory(user,sample,action){
-  if(user){
+function writeToHistory(user, sample, action) {
+  if (user) {
     var bits = user.split("=|=|=|=|=");
-  }else{
-    bits = ['','Anon'];
+  } else {
+    bits = ['', 'Anon'];
   }
-  var actionLog = '***'+Date.now()+' - '+bits[1]+" "+action+" "+sample+"\n";
+  var actionLog = '***' + Date.now() + ' - ' + bits[1] + " " + action + " " + sample + "\n";
   console.log(actionLog);
-  fs.appendFile("eartalk/server.log", actionLog, function(err) {});
+  fs.appendFile("server.log", actionLog, function(err) {});
 }
 
-function stripName(id){
-  if(id){
-    return id.split("=|=|=|=|=")[0];    
+function stripName(id) {
+  if (id) {
+    return id.split("=|=|=|=|=")[0];
   }
   return "none";
 }
 
 
-function getName(id){
-  if(id){
-    return id.split("=|=|=|=|=")[1];    
+function getName(id) {
+  if (id) {
+    return id.split("=|=|=|=|=")[1];
   }
   return "Anon";
 }
@@ -114,11 +114,36 @@ var server = http.createServer(function(request, response) {
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
     serverLog(stripName(query.id));
-    if (request.url.startsWith("/updateScore")) {
+    if (request.url.startsWith("/firstPing")) {
       var requestBody = '';
       request.on('data', function(data) {
         requestBody += data;
-        if (requestBody.length > 1e7) {
+        if (requestBody.length > 1e20) {
+          response.writeHead(413, 'Request Entity Too Large', {
+            'Content-Type': 'text/html'
+          });
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        var data = JSON.parse(requestBody);
+        console.log(data);
+        response.writeHead(200, {
+          "Content-Type": "text/plain"
+        });
+        roles = ['distort','lowpass','volume','pan']
+        data_to_write = JSON.stringify({
+          role: roles[Math.floor(Math.random() * roles.length)]
+        });
+        response.write(data_to_write);
+        response.end();
+      });
+
+    } else if (request.url.startsWith("/updateScore")) {
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if (requestBody.length > 1e20) {
           response.writeHead(413, 'Request Entity Too Large', {
             'Content-Type': 'text/html'
           });
@@ -129,7 +154,7 @@ var server = http.createServer(function(request, response) {
         // should probably do something to make sure this is an atomic function.
         var data = JSON.parse(requestBody);
         console.log(data);
-        let rawdata = fs.readFileSync('eartalk/score.json');
+        let rawdata = fs.readFileSync('score.json');
         let scoreJson = JSON.parse(rawdata);
         Object.keys(data.params_for_edit).forEach((name) => {
           console.log(name);
@@ -138,15 +163,15 @@ var server = http.createServer(function(request, response) {
             scoreJson[data.sample_id][name] = data.params_for_edit[name];
           }
         });
-        if(Object.keys(data.params_for_edit).length < 1){
+        if (Object.keys(data.params_for_edit).length < 1) {
           delete scoreJson[data.sample_id];
-          writeToHistory(query.id,data.sample_id,'deleted');
-        }else{
-          writeToHistory(query.id,data.sample_id,'moved');
+          writeToHistory(query.id, data.sample_id, 'deleted');
+        } else {
+          writeToHistory(query.id, data.sample_id, 'moved');
         }
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
-        fs.writeFileSync('eartalk/score.json', data_to_write);
+        fs.writeFileSync('score.json', data_to_write);
         response.writeHead(200, {
           "Content-Type": "text/plain"
         });
@@ -163,27 +188,29 @@ var server = http.createServer(function(request, response) {
         console.log(err);
 
         // figure out what sample number it should be
-        fs.readdir('eartalk/samples', (err, files_in_folder) => {
+        fs.readdir('samples', (err, files_in_folder) => {
           var howMany = files_in_folder.length;
           var name_to_use = files['upload'].name;
-          if(name_to_use == 'blob'){
+          if (name_to_use == 'blob') {
             name_to_use = getName(query.id);
           }
           var new_sample_id = 's' + howMany + '_' + name_to_use;
-          copyFile(files['upload'].path, 'eartalk/samples', new_sample_id, () => {
+          copyFile(files['upload'].path, 'samples', new_sample_id, () => {
             console.log("wow ok something new here too");
 
-            let rawdata = fs.readFileSync('eartalk/score.json');
+            let rawdata = fs.readFileSync('score.json');
             let scoreJson = JSON.parse(rawdata);
             scoreJson[new_sample_id] = {
               "startTime": 0,
               "volume": 0.01,
-              "pan": 0.5
+              "pan": 0.5,
+              "distort": 0.01,
+              "lowpass": 0.9,
             }
             console.log(scoreJson);
             let data_to_write = JSON.stringify(scoreJson);
-            fs.writeFileSync('eartalk/score.json', data_to_write);
-            writeToHistory(query.id,new_sample_id,'uploaded');
+            fs.writeFileSync('score.json', data_to_write);
+            writeToHistory(query.id, new_sample_id, 'uploaded');
           })
           response.writeHead(200, {
             'content-type': 'text/plain'
@@ -204,10 +231,10 @@ var server = http.createServer(function(request, response) {
         fs.readdir('hands/samples', (err, files_in_folder) => {
           var howMany = files_in_folder.length;
           var name_to_use = files['upload'].name;
-          if(name_to_use == 'blob'){
+          if (name_to_use == 'blob') {
             name_to_use = getName(query.id);
           }
-          var new_sample_id = 's' + howMany + '_' + name_to_use+'.wav';
+          var new_sample_id = 's' + howMany + '_' + name_to_use + '.wav';
           copyFile(files['upload'].path, 'hands/samples', new_sample_id, () => {
             console.log("wow ok something new here too");
           })

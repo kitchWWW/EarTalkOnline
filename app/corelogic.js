@@ -9,7 +9,7 @@ function masterIntervalStepper() {
     }
     if (scoreSampleInstruction.startTime > time - GLOBAL_TIMESTEP && scoreSampleInstruction.startTime < time) {
       //tell the thing to start playing
-      allSoundFiles[fileName].play();
+      allSoundFiles[fileName].file.play();
     }
     doParamsUpdate(fileName);
   });
@@ -33,8 +33,6 @@ function masterScoreRefresh() {
       return e;
     });
 
-
-
   fetch(URL_PREFIX+"server.log?id=" + SESSION_ID)
     .then(function(response) {
       return response.text();
@@ -55,9 +53,6 @@ var serverUpdateTimeout = null;
 
 function updateServerScore(sample_id, params_for_edit) {
   updateSessionID();
-  console.log("DOING THE UPDATE!");
-  console.log(sample_id);
-  console.log(params_for_edit);
   CAN_DO_UPDATE = false;
   postData('/updateScore?id=' + SESSION_ID, {
       sample_id: sample_id,
@@ -65,14 +60,18 @@ function updateServerScore(sample_id, params_for_edit) {
     })
     .then((data) => {
       CAN_DO_UPDATE = true;
-      console.log("DID THE UPDATE!");
-      console.log(data); // JSON data parsed by `response.json()` call
     });
 }
 
 function doParamsUpdate(fileName) {
-  allSoundFiles[fileName].volume = scoreAllSoundInstructions[fileName].volume
-  allSoundFiles[fileName].pan = scoreAllSoundInstructions[fileName].pan
+  if(IS_MASTER_VIEWER){
+    allSoundFiles[fileName].file.volume = scoreAllSoundInstructions[fileName].volume;
+  }else{
+    allSoundFiles[fileName].file.volume = 0;
+  }
+  allSoundFiles[fileName].pan.pan = (scoreAllSoundInstructions[fileName].pan * 2.0) - 1;
+  allSoundFiles[fileName].distort.gain = scoreAllSoundInstructions[fileName].distort;
+  allSoundFiles[fileName].lowpass.frequency = (Math.log((scoreAllSoundInstructions[fileName].lowpass + 1)) / (Math.log(10)))*20000.0;
 }
 
 function doMute() {
@@ -104,8 +103,39 @@ async function stopRecording() {
 
 }
 
+function paramChange(new_param){
+	MY_PARAM_TO_CONTROL = new_param;
+	var paramToDisplay = {
+		'volume':'Volume Master',
+		'pan': 'Pan Master',
+		'distort': 'Distortion Master',
+		'lowpass': 'Clarity Master'
+	}[MY_PARAM_TO_CONTROL]
+	document.getElementById("myActiveRole").innerHTML = paramToDisplay
+  addLabelWithParam(MY_PARAM_TO_CONTROL);
+}
+
+
+function updateForMasterViewer(){
+  if(!IS_MASTER_VIEWER){
+    MASTER_GROUP.volume = 0;
+    document.getElementById("show_for_master_viewer").style.display = "none";
+  }
+}
+
 
 function doInit() {
+  // request to see what role we fill
+  IS_MASTER_VIEWER = !(getUrlVars()['master'] == undefined);
+  postData('/firstPing?id=' + SESSION_ID, {
+      sample_id: '3',
+      params_for_edit: 'a',
+    })
+    .then((data) => {
+      MY_PARAM_TO_CONTROL = data['role']
+      paramChange(MY_PARAM_TO_CONTROL);
+    });
+
   Object.keys(scoreAllSoundInstructions).forEach((fileName) => {
     var myNewObject = {}
     myNewObject.startTime = Math.floor(Math.random() * TOTAL_LENGTH_OF_COMPOSITION); // also should subtract diff out.
@@ -113,6 +143,5 @@ function doInit() {
     myNewObject.pan = .5;
     loadFile(fileName)
     scoreAllSoundInstructions[fileName] = myNewObject;
-    console.log(scoreAllSoundInstructions);
   });
 }

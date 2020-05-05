@@ -1,23 +1,55 @@
-const URL_PREFIX = 'eartalk/'
+const URL_PREFIX = '/'
 
 
 function URLify(string) {
   return string.trim().replace(/\s/g, '%20');
 }
 
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
 
 function loadFile(fileName) {
-  var new_file = new Pizzicato.Sound(URL_PREFIX+'samples/' + fileName, function() {
+  var new_sound_clip = new Pizzicato.Sound(URL_PREFIX + 'samples/' + fileName, function() {
     // console.log("loaded " + fileName + "!");
     doParamsUpdate(fileName);
-    allSoundFiles[fileName].et_sn = allSoundFiles[fileName].getRawSourceNode();
+    allSoundFiles[fileName]['et_sn'] = allSoundFiles[fileName].file.getRawSourceNode();
     // console.log(allSoundFiles[fileName]);
     doAnimationScoreUpdate();
 
   });
-  allSoundFiles[fileName] = new_file;
-  // console.log(allSoundFiles);
-  MASTER_GROUP.addSound(new_file);
+
+  var stereoPanner = new Pizzicato.Effects.StereoPanner({
+    pan: 0.0
+  });
+
+  var distortion = new Pizzicato.Effects.Distortion({
+    gain: 0.0
+  });
+
+  var lowPassFilter = new Pizzicato.Effects.LowPassFilter({
+    frequency: 400,
+    peak: 10
+  });
+
+
+  new_sound_clip.addEffect(distortion);
+  new_sound_clip.addEffect(stereoPanner);
+  new_sound_clip.addEffect(lowPassFilter);
+
+  new_whole_object = {
+    file: new_sound_clip,
+    pan: stereoPanner,
+    distort: distortion,
+    lowpass: lowPassFilter,
+  }
+
+  allSoundFiles[fileName] = new_whole_object;
+  MASTER_GROUP.addSound(new_sound_clip);
 
 }
 
@@ -27,6 +59,9 @@ function showAll() {
   MASTER_GROUP.volume = 1;
   IS_IN_MUTE = false;
   document.getElementById("fname").value = document.getElementById("cname").value
+  window.setTimeout(addHelpText, 300);
+  window.setTimeout(removeHelpText, 3200);
+
 }
 
 async function postData(url = '', data = {}) {
@@ -91,7 +126,7 @@ function formSubmit() {
 
 
 function sendFDtoServer(fd) {
-    updateSessionID();
+  updateSessionID();
 
   var url = "/eartalkUpload?id=" + SESSION_ID;
   var request = new XMLHttpRequest();
