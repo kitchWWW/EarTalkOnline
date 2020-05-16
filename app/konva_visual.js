@@ -64,6 +64,7 @@ function addLabelWithParam(param) {
 	label_layer.add(label1);
 	label_layer.add(label2);
 	stage.add(label_layer);
+	label_layer.moveToBottom();
 }
 
 var instructions_layer = new Konva.Layer();

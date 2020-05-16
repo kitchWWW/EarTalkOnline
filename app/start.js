@@ -40,7 +40,7 @@ var reverb = new Pizzicato.Effects.Reverb({
 	time: 1.45,
 	decay: 1,
 	reverse: false,
-	mix: 0.9
+	mix: 0
 });
 
 var IS_MASTER_VIEWER = false;

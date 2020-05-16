@@ -19,6 +19,7 @@ function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
 }
 
+
 function writeToHistory(user, sample, action) {
   if (user) {
     var bits = user.split("=|=|=|=|=");
@@ -29,6 +30,20 @@ function writeToHistory(user, sample, action) {
   console.log(actionLog);
   fs.appendFile("server.log", actionLog, function(err) {});
 }
+
+
+function writeToChat(user,chat_text) {
+  if (user) {
+    var bits = user.split("=|=|=|=|=");
+  } else {
+    bits = ['', 'Anon'];
+  }
+  var chatLog = Date.now() + ' - ' + bits[1] + ": " + chat_text + "\n";
+  console.log(chatLog);
+  console.log("***" + Date.now() + " " + data);
+  fs.appendFile("chat.log", chatLog, function(err) {});
+}
+
 
 function stripName(id) {
   if (id) {
@@ -72,6 +87,33 @@ var server = http.createServer(function(request, response) {
   serverLog(request.method);
   serverLog(request.url);
   if (request.method === "GET") {
+    if (request.url.startsWith("/listAllScores")) {
+      console.log('wowo hi');
+      // parse a file upload
+      //requiring path and fs modules
+      //joining path of directory 
+      //passsing directoryPath and callback function
+      const directoryPath = path.join(__dirname, 'old_scores');
+      const files_names = [];
+      fs.readdir(directoryPath, function(err, files) {
+        //handling error
+        if (err) {
+          return console.log('Unable to scan directory: ' + err);
+        }
+        //listing all files using forEach
+        files.forEach(function(file) {
+          // Do whatever you want to do with the file
+          console.log(file);
+          files_names.push(file);
+        });
+        response.writeHead(200, {
+          'content-type': 'text/plain'
+        });
+        response.write(JSON.stringify(files_names));
+        response.end();
+      });
+    }
+
     var uri = url.parse(request.url).pathname,
       filename = path.join(process.cwd(), uri);
 
@@ -131,7 +173,7 @@ var server = http.createServer(function(request, response) {
         response.writeHead(200, {
           "Content-Type": "text/plain"
         });
-        roles = ['distort','lowpass','volume','pan']
+        roles = ['distort', 'lowpass', 'volume', 'pan']
         data_to_write = JSON.stringify({
           role: roles[Math.floor(Math.random() * roles.length)]
         });
@@ -172,6 +214,7 @@ var server = http.createServer(function(request, response) {
         console.log(scoreJson);
         let data_to_write = JSON.stringify(scoreJson);
         fs.writeFileSync('score.json', data_to_write);
+        fs.writeFileSync('old_scores/score_' + Date.now() + '.json', data_to_write);
         response.writeHead(200, {
           "Content-Type": "text/plain"
         });
@@ -182,6 +225,7 @@ var server = http.createServer(function(request, response) {
     } else if (request.url.startsWith("/eartalkUpload")) {
       // parse a file upload
       var form = new formidable.IncomingForm();
+      form.maxFileSize = 200 * 1024 * 1024; // 200mb max file size. Thing says 100, so we give people some buffer.
       form.parse(request, function(err, fields, files) {
         console.log(fields);
         console.log(files);
@@ -202,10 +246,10 @@ var server = http.createServer(function(request, response) {
             let scoreJson = JSON.parse(rawdata);
             scoreJson[new_sample_id] = {
               "startTime": 0,
-              "volume": 0.01,
-              "pan": 0.5,
-              "distort": 0.01,
-              "lowpass": 0.9,
+              "volume": Math.random(),
+              "pan": Math.random(),
+              "distort": Math.random(),
+              "lowpass": Math.random(),
             }
             console.log(scoreJson);
             let data_to_write = JSON.stringify(scoreJson);
