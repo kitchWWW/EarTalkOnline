@@ -25,3 +25,5 @@ h3{
   margin: auto;
 
 }
+
+span.avoidwrap { display:inline-block; }

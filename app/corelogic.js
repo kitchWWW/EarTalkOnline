@@ -18,7 +18,7 @@ function masterIntervalStepper() {
 
 function masterScoreRefresh() {
   updateSessionID();
-  fetch(URL_PREFIX+"score.json?id=" + SESSION_ID)
+  fetch(URL_PREFIX + "score.json?id=" + SESSION_ID)
     .then(blob => blob.json())
     .then(data => {
       var old_scoreAllSoundInstructions = scoreAllSoundInstructions
@@ -33,19 +33,31 @@ function masterScoreRefresh() {
       return e;
     });
 
-  fetch(URL_PREFIX+"server.log?id=" + SESSION_ID)
+  fetch(URL_PREFIX + "server.log?id=" + SESSION_ID)
     .then(function(response) {
       return response.text();
     }).then(function(data) {
       oldDisplayData = displayData;
       var regex = /\*\*\*/gi;
       var displayData = data.replace(regex, "<br />***");
-      document.getElementById("history_chat").innerHTML = "" + displayData;
+      document.getElementById("history_log").innerHTML = "" + displayData;
       if (IS_FIRST_TIME_LOADING_CHAT) {
-        var objDiv = document.getElementById("history_chat");
+        var objDiv = document.getElementById("history_log");
         objDiv.scrollTop = objDiv.scrollHeight;
         IS_FIRST_TIME_LOADING_CHAT = false;
       }
+    });
+
+  fetch(URL_PREFIX + "chat.log?id=" + SESSION_ID)
+    .then(function(response) {
+      return response.text();
+    }).then(function(data) {
+      oldDisplayData = displayData;
+      var regex = /\*\*\*/gi;
+      var displayData = data.replace(regex, "<br />***");
+      document.getElementById("chat_log").innerHTML = "" + displayData;
+      var objDiv = document.getElementById("chat_log");
+      objDiv.scrollTop = objDiv.scrollHeight;
     });
 }
 
@@ -64,14 +76,14 @@ function updateServerScore(sample_id, params_for_edit) {
 }
 
 function doParamsUpdate(fileName) {
-  if(IS_MASTER_VIEWER){
+  if (IS_MASTER_VIEWER) {
     allSoundFiles[fileName].file.volume = scoreAllSoundInstructions[fileName].volume;
-  }else{
+  } else {
     allSoundFiles[fileName].file.volume = 0;
   }
   allSoundFiles[fileName].pan.pan = (scoreAllSoundInstructions[fileName].pan * 2.0) - 1;
   allSoundFiles[fileName].distort.gain = scoreAllSoundInstructions[fileName].distort;
-  allSoundFiles[fileName].lowpass.frequency = (Math.log((scoreAllSoundInstructions[fileName].lowpass + 1)) / (Math.log(10)))*20000.0;
+  allSoundFiles[fileName].lowpass.frequency = (Math.log((scoreAllSoundInstructions[fileName].lowpass + 1)) / (Math.log(10))) * 20000.0;
 }
 
 function doMute() {
@@ -86,7 +98,7 @@ function doMute() {
   }
 }
 
-async function startRecording(){
+async function startRecording() {
   recorder = await recordAudio();
   recorder.start();
   document.getElementById("startRecordButton").style.display = "none";
@@ -103,30 +115,34 @@ async function stopRecording() {
 
 }
 
-function paramChange(new_param){
-	MY_PARAM_TO_CONTROL = new_param;
-	var paramToDisplay = {
-		'volume':'Volume Master',
-		'pan': 'Pan Master',
-		'distort': 'Distortion Master',
-		'lowpass': 'Clarity Master'
-	}[MY_PARAM_TO_CONTROL]
-	document.getElementById("myActiveRole").innerHTML = paramToDisplay
+function paramChange(new_param) {
+  MY_PARAM_TO_CONTROL = new_param;
+  var paramToDisplay = {
+    'volume': 'Volume Master',
+    'pan': 'Pan Master',
+    'distort': 'Distortion Master',
+    'lowpass': 'Clarity Master'
+  }[MY_PARAM_TO_CONTROL]
+  document.getElementById("myActiveRole").innerHTML = paramToDisplay
   addLabelWithParam(MY_PARAM_TO_CONTROL);
 }
 
 
-function updateForMasterViewer(){
-  if(!IS_MASTER_VIEWER){
+function updateForMasterViewer() {
+  if (!IS_MASTER_VIEWER) {
     MASTER_GROUP.volume = 0;
     document.getElementById("show_for_master_viewer").style.display = "none";
   }
 }
 
-
 function doInit() {
   // request to see what role we fill
-  IS_MASTER_VIEWER = !(getUrlVars()['master'] == undefined);
+  IS_MASTER_VIEWER = (getUrlVars()['master'] === 'true');
+  var name = getUrlVars()['name'];
+  if(name == undefined){
+    name = 'ANON'
+  }
+  document.getElementById("fname").value = decodeURI(name);
   postData('/firstPing?id=' + SESSION_ID, {
       sample_id: '3',
       params_for_edit: 'a',

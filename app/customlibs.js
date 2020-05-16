@@ -15,10 +15,8 @@ function getUrlVars() {
 
 function loadFile(fileName) {
   var new_sound_clip = new Pizzicato.Sound(URL_PREFIX + 'samples/' + fileName, function() {
-    // console.log("loaded " + fileName + "!");
     doParamsUpdate(fileName);
     allSoundFiles[fileName]['et_sn'] = allSoundFiles[fileName].file.getRawSourceNode();
-    // console.log(allSoundFiles[fileName]);
     doAnimationScoreUpdate();
 
   });
@@ -50,17 +48,6 @@ function loadFile(fileName) {
 
   allSoundFiles[fileName] = new_whole_object;
   MASTER_GROUP.addSound(new_sound_clip);
-
-}
-
-function showAll() {
-  document.getElementById("allInteraction").style.display = "block";
-  document.getElementById("intro_page").style.display = "none";
-  MASTER_GROUP.volume = 1;
-  IS_IN_MUTE = false;
-  document.getElementById("fname").value = document.getElementById("cname").value
-  window.setTimeout(addHelpText, 300);
-  window.setTimeout(removeHelpText, 3200);
 
 }
 
@@ -183,3 +170,11 @@ const recordAudio = () => {
       });
   });
 };
+
+
+function firstView() {
+  MASTER_GROUP.volume = 1;
+  IS_IN_MUTE = false;
+  window.setTimeout(addHelpText, 300);
+  window.setTimeout(removeHelpText, 3200);
+}

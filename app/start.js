@@ -5,13 +5,6 @@
 document.getElementById("fileUploadForm").onchange = function() {
 	formSubmit();
 };
-document.getElementById("cname")
-    .addEventListener("keyup", function(event) {
-    event.preventDefault();
-    if (event.keyCode === 13) {
-        document.getElementById("go_all").click();
-    }
-});
 
 // the stupid junk you have to do to get pizz audio to work on mobile.
 window.onclick = function() {
@@ -23,6 +16,21 @@ window.onclick = function() {
 	var noSleep = new NoSleep();
 }
 
+// set up the chat box:
+document.getElementById('message_box').onkeypress = function(e) {
+	if (!e) e = window.event;
+	var keyCode = e.keyCode || e.which;
+	if (keyCode == '13') {
+		var chat_message = document.getElementById('message_box').value;
+		document.getElementById('message_box').value = '';
+		postData('/chat?id=' + SESSION_ID, {
+			message: encodeURI(chat_message),
+		});
+	}
+}
+
+
+
 // set all your shit
 scoreAllSoundInstructions = {} // in future will be something we get, store, and refresh from server
 allSoundFiles = {}
@@ -30,10 +38,10 @@ IS_IN_MUTE = true; // start off muted;
 
 GLOBAL_TIMESTEP = 1000 / 20.0; // 13 frames a second, enough to fool eye in scrolling.
 GLOBAL_REFRESH = 1000; // how frequently we request a new score from the server
-TOTAL_LENGTH_OF_COMPOSITION = 120 * 1000; 
+TOTAL_LENGTH_OF_COMPOSITION = 120 * 1000;
 ANIMATION_TIME_CURRENT = 0;
 IS_FIRST_TIME_LOADING_CHAT = true;
-MY_PARAM_TO_CONTROL = 'volume';	// should be volume or pan for now, something else maybe later. 
+MY_PARAM_TO_CONTROL = 'volume'; // should be volume or pan for now, something else maybe later. 
 var recorder = null;
 
 var reverb = new Pizzicato.Effects.Reverb({
@@ -60,12 +68,5 @@ window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);
 updateForMasterViewer();
 
 
-
-
-
-
-
-
-
-
-
+// and now that everything is ready to go and loaded, we "show" it.
+window.addEventListener("load", firstView);

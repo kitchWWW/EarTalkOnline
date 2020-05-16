@@ -26,7 +26,7 @@ function writeToHistory(user, sample, action) {
   } else {
     bits = ['', 'Anon'];
   }
-  var actionLog = '***' + Date.now() + ' - ' + bits[1] + " " + action + " " + sample + "\n";
+  var actionLog = bits[1] + " " + action + " " + sample+'\n';
   console.log(actionLog);
   fs.appendFile("server.log", actionLog, function(err) {});
 }
@@ -38,9 +38,9 @@ function writeToChat(user,chat_text) {
   } else {
     bits = ['', 'Anon'];
   }
-  var chatLog = Date.now() + ' - ' + bits[1] + ": " + chat_text + "\n";
+  var chatLog = bits[1] + ": " + chat_text+'\n';
   console.log(chatLog);
-  console.log("***" + Date.now() + " " + data);
+  console.log("***" + Date.now() + " chat: " + chatLog);
   fs.appendFile("chat.log", chatLog, function(err) {});
 }
 
@@ -178,6 +178,28 @@ var server = http.createServer(function(request, response) {
           role: roles[Math.floor(Math.random() * roles.length)]
         });
         response.write(data_to_write);
+        response.end();
+      });
+
+    }else if (request.url.startsWith("/chat")) {
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if (requestBody.length > 1e20) {
+          response.writeHead(413, 'Request Entity Too Large', {
+            'Content-Type': 'text/html'
+          });
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        var data = JSON.parse(requestBody);
+        console.log(data);
+        writeToChat(query.id, decodeURI(data.message));
+        response.writeHead(200, {
+          "Content-Type": "text/plain"
+        });
+        response.write('{}');
         response.end();
       });
 
