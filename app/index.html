@@ -12,46 +12,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="index.css">
-    <style>
-    body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #f0f0f0;
-    }
-    </style>
   </head>
   <body>
-    <div class="d-flex justify-content-center">
-      <div style="margin-top:40px;   text-align: center;">
-        <h1>Ear Talk: Neverending</h1>
-        <h3><i>a collaborative online music making experience</i></h3>
-        <br>
-        <a href="staging.html?master=true"><button class="btn btn-primary" id="go_all" style="margin-top:10px; width:200px">join independently</button></a>
-        <br>
-        <br>
-        <a href="staging.html?master=false"><button class="btn btn-secondary" id="go_all" style="margin-top:10px; width:200px" onclick="showAll()">join as stream viewer</button></a>
-        <br>
-        <br>
-        <div class="customwidth" style="text-align: left;" >
-          Ear Talk is an online platform for collaborative near-real time distributed music making. By taking musical material and direction from all participants, not just trained composers, earTalk aims to diversity and encourage participation in the new music community. Participants take part in this conversation via an interactive score where they can drag and drop musical components, controlling parameters such as volume, pan, and distortion as they do so.
-          <br>
-          <br>
-          As this website is always live, it is intended to exist as continuous live improvisation sound installation.
-          <br>
-          <br>
-          Join independently if you are finding this of your own volition, or join as a stream viewer if you are participating as part of a larger event.
-        </div>
-        <div class="footer">
-        <p><i>earTalk<br>
-          brainchild of <a target="_blank" href="http://toshihisatsuruoka.com/">
-          Toshi</a>, <a target="_blank" href="http://www.listentoleo.com/">Leo</a>, and <a target="_blank" href="https://oliverhickmanmusic.com/">Oliver</a><br>
-          implemented by <a target="_blank" href="http://www.brianellissound.com">Brian</a> </i></p>
+    <div id="page-container">
+      <div id="content-wrap">
+        <div class="d-flex justify-content-center">
+          <div style="margin-top:40px;   text-align: center;">
+            <h1>Ear Talk: Neverending</h1>
+            <h3><i>a collaborative online music making experience</i></h3>
+            <br>
+            <a href="staging.html?mode=master"><button class="btn btn-primary" id="go_all" style="margin-top:10px; width:200px">join!</button></a>
+            <br>
+            <a href="staging.html?mode=history"><button class="btn btn-secondary" id="go_all" style="margin-top:10px; width:200px">look back</button></a>
+            <br>
+            <br>
+            <div class="customwidth" style="text-align: left;" >
+              Ear Talk is an online platform for collaborative near-real time distributed music making. By taking musical material and direction from all participants, not just trained composers, earTalk aims to diversity and encourage participation in the new music community. Participants take part in this conversation via an interactive score where they can drag and drop musical components, controlling parameters such as volume, pan, and distortion as they do so.
+              <br>
+              <br>
+              As this website is always live, it is intended to exist as continuous live improvisation sound installation.
+              <br>
+              <br>
+              Click join if you are finding this of your own volition, or join as a <a href="staging.html?mode=streamview">stream viewer</a> if you are participating as part of a larger event.
+              <br>
+              <br>
+              <br>
+              <br>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
-</html>
+      <footer id="footer">
+        <p><i>Ear Talk: Neverending<br>
+          brainchild of <a target="_blank" href="http://toshihisatsuruoka.com/">
+            Toshi</a>, <a target="_blank" href="http://www.listentoleo.com/">Leo</a>, and <a target="_blank" href="https://oliverhickmanmusic.com/">Oliver</a><br>
+            implemented by <a target="_blank" href="http://www.brianellissound.com">Brian</a> </i></p>
+          </footer>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+      </body>
+    </html>

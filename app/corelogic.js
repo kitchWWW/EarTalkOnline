@@ -1,5 +1,5 @@
 function masterIntervalStepper() {
-  time = Math.floor(Date.now());
+  time = Math.floor(Date.now())- TIME_OFFSET; // go back in time :)
   time = time % TOTAL_LENGTH_OF_COMPOSITION; // keep it within 0 -> total length
   ANIMATION_TIME_CURRENT = time;
   Object.keys(scoreAllSoundInstructions).forEach((fileName) => {
@@ -18,7 +18,7 @@ function masterIntervalStepper() {
 
 function masterScoreRefresh() {
   updateSessionID();
-  fetch(URL_PREFIX + "score.json?id=" + SESSION_ID)
+  fetch(URL_PREFIX + "score.json?id=" + SESSION_ID+"&timeOffset="+TIME_OFFSET)
     .then(blob => blob.json())
     .then(data => {
       var old_scoreAllSoundInstructions = scoreAllSoundInstructions
@@ -76,7 +76,7 @@ function updateServerScore(sample_id, params_for_edit) {
 }
 
 function doParamsUpdate(fileName) {
-  if (IS_MASTER_VIEWER) {
+  if (VIEWER_MODE != 'streamview') {
     allSoundFiles[fileName].file.volume = scoreAllSoundInstructions[fileName].volume;
   } else {
     allSoundFiles[fileName].file.volume = 0;
@@ -128,16 +128,23 @@ function paramChange(new_param) {
 }
 
 
-function updateForMasterViewer() {
-  if (!IS_MASTER_VIEWER) {
+function updateForViewMode() {
+  if (VIEWER_MODE != 'master') {
     MASTER_GROUP.volume = 0;
     document.getElementById("show_for_master_viewer").style.display = "none";
   }
+  if(VIEWER_MODE == 'history'){
+    document.getElementById("select_screen_name_div").style.display = "none";
+    document.getElementById("send_message_div").style.display = "none";
+    GLOBAL_REFRESH = 200; // we need to ping the server a lot more.
+  }
 }
+
 
 function doInit() {
   // request to see what role we fill
-  IS_MASTER_VIEWER = (getUrlVars()['master'] === 'true');
+  VIEWER_MODE = getUrlVars()['mode'];
+  TIME_OFFSET = getUrlVars()['timeOffset'];
   var name = getUrlVars()['name'];
   if(name == undefined){
     name = 'ANON'

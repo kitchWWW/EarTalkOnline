@@ -10,7 +10,7 @@ var samples_layer = new Konva.Layer();
 var trash_layer = new Konva.Layer();
 
 
-if (IS_MASTER_VIEWER) {
+if (VIEWER_MODE == 'master') {
 	// main API:
 	var imageObj = new Image();
 	imageObj.onload = function() {
@@ -31,8 +31,7 @@ if (IS_MASTER_VIEWER) {
 }
 
 
-var label_layer = new Konva.Layer();
-stage.add(label_layer);
+var big_text_layer = new Konva.Layer();
 
 label_options = {
 	volume: ['louder', 'softer'],
@@ -43,33 +42,52 @@ label_options = {
 
 var text_height = 40;
 
+function doHelpText() {
+	if (VIEWER_MODE != 'history') {
+		addHelpText();
+		window.setTimeout(removeHelpText, 2800);
+	}
+}
+var label1;
+var label2;
+
 function addLabelWithParam(param) {
-	label_layer.destroy()
-	var label1 = new Konva.Text({
-		x: 5,
-		y: 5,
-		text: label_options[MY_PARAM_TO_CONTROL][0],
-		fontSize: text_height,
-		fontFamily: 'arial',
-		fill: '#404040'
-	});
-	var label2 = new Konva.Text({
-		x: 5,
-		y: height - text_height - 5,
-		text: label_options[MY_PARAM_TO_CONTROL][1],
-		fontSize: text_height,
-		fontFamily: 'arial',
-		fill: '#404040'
-	});
-	label_layer.add(label1);
-	label_layer.add(label2);
-	stage.add(label_layer);
-	label_layer.moveToBottom();
+	if (VIEWER_MODE != 'history') {
+		if (label1 != null) {
+			label1.destroy()
+		}
+		if (label2 != null) {
+			label2.destroy()
+		}
+		label1 = new Konva.Text({
+			x: 5,
+			y: 5,
+			text: label_options[MY_PARAM_TO_CONTROL][0],
+			fontSize: text_height,
+			fontFamily: 'arial',
+			fill: '#404040',
+			opacity: 0.5
+
+		});
+		label2 = new Konva.Text({
+			x: 5,
+			y: height - text_height - 5,
+			text: label_options[MY_PARAM_TO_CONTROL][1],
+			fontSize: text_height,
+			fontFamily: 'arial',
+			fill: '#404040',
+			opacity: 0.5
+		});
+		big_text_layer.add(label1);
+		big_text_layer.add(label2);
+		big_text_layer.moveToBottom();
+	}
 }
 
-var instructions_layer = new Konva.Layer();
+var instructions_label = null;
+
 function addHelpText() {
-	var instructions_label = new Konva.Text({
+	instructions_label = new Konva.Text({
 		x: width / 2,
 		y: height / 2,
 		text: "drag and drop the sounds",
@@ -78,38 +96,86 @@ function addHelpText() {
 		fill: 'black'
 	});
 	instructions_label.offsetX(instructions_label.width() / 2);
-	instructions_layer.add(instructions_label);
-	stage.add(instructions_layer);
+	big_text_layer.add(instructions_label);
 }
 
-function removeHelpText(){
-	instructions_layer.destroy();
+function removeHelpText() {
+	instructions_label.destroy();
 }
+
+
 
 SAMPLE_HEIGHT = 30;
 CAN_DO_UPDATE = true;
 NAME_TO_UPDATE = ''
+DRAGGING_DISABLED_FOR_N_SECONDS = 0;
 
 
-
-var layer = new Konva.Layer();
+var red_line_layer = new Konva.Layer();
 
 var redLine = new Konva.Line({
 	points: [0, 0, 0, height],
 	stroke: 'red',
-	strokeWidth: 15,
+	strokeWidth: 7,
 	lineCap: 'round',
-	lineJoin: 'round'
+	lineJoin: 'round',
+	opacity: 0.9,
 });
-layer.add(redLine)
-stage.add(layer);
+red_line_layer.add(redLine)
 var anim = new Konva.Animation(function(frame) {
 	var xVal = (ANIMATION_TIME_CURRENT * width) / TOTAL_LENGTH_OF_COMPOSITION
 	redLine.points([xVal, 0, xVal, height]);
-}, layer);
+}, red_line_layer);
 anim.start();
-stage.add(layer)
 
+
+
+function isDraggable() {
+	if (VIEWER_MODE == 'history') {
+		return false;
+	}
+	return DRAGGING_DISABLED_FOR_N_SECONDS == 0;
+}
+
+var drag_inform_layer = new Konva.Layer();
+var drag_label = null;
+var drag_background = null;
+function updateDraggingStatus() {
+	DRAGGING_DISABLED_FOR_N_SECONDS += -1;
+	if (DRAGGING_DISABLED_FOR_N_SECONDS == 0) {
+		// do nothing! celebrate!
+		drag_label.destroy();
+		drag_background.destroy();
+		return;
+	}
+	drag_label.text("next move: " + DRAGGING_DISABLED_FOR_N_SECONDS)
+	window.setTimeout(updateDraggingStatus, 1000);
+}
+
+function disableDragging(seconds) {
+	DRAGGING_DISABLED_FOR_N_SECONDS = seconds + 1;
+	drag_label = new Konva.Text({
+		x: width-200,
+		y: 5,
+		text: "next move: 10",
+		fontSize: 30,
+		fontFamily: 'arial',
+		fill: 'black',
+	});
+	drag_background = new Konva.Rect({
+			x: 0,
+			y: 0,
+			width: width,
+			height: height,
+			fill: '#000000',
+			stroke: 'black',
+			strokeWidth: 3,
+			opacity: 0.1,
+		});
+	drag_inform_layer.add(drag_label);
+	drag_inform_layer.add(drag_background);
+	updateDraggingStatus();
+}
 
 function doAnimationScoreUpdate() {
 	if (!CAN_DO_UPDATE) {
@@ -136,7 +202,8 @@ function doAnimationScoreUpdate() {
 			height: SAMPLE_HEIGHT,
 			fill: '#00D2FF',
 			stroke: 'black',
-			strokeWidth: 4,
+			strokeWidth: 3,
+			opacity: 0.7
 		});
 		var filename_to_display = fileName.split("_")
 		filename_to_display = filename_to_display.slice(1, filename_to_display.length).join("_")
@@ -146,10 +213,11 @@ function doAnimationScoreUpdate() {
 			text: filename_to_display,
 			fontSize: 20,
 			fontFamily: 'arial',
-			fill: 'black'
+			fill: 'black',
+			opacity: 0.7
 		});
 		var group = new Konva.Group({
-			draggable: true
+			draggable: isDraggable() // if it history, no drag. if not, drag!
 		});
 		group.add(box);
 		group.add(simpleText);
@@ -158,7 +226,11 @@ function doAnimationScoreUpdate() {
 		// add cursor styling
 
 		var myUpdateFunction = function(e) {
-			if (IS_MASTER_VIEWER) {
+			if (!isDraggable()) {
+				return;
+			}
+			disableDragging(10);
+			if (VIEWER_MODE == 'master') {
 				group = GROUP_TO_USE
 				if (e.evt.layerX > width - 50) {
 					if (e.evt.layerY > height - 50) {
@@ -215,6 +287,9 @@ function doAnimationScoreUpdate() {
 		};
 
 		var myStartDragFunction = function(e) {
+			if (!isDraggable()) {
+				return;
+			}
 			CAN_DO_UPDATE = false;
 			GROUP_TO_USE = group;
 			DIFFERENCE_IN_X = e.evt.x - e.target.x();
@@ -236,7 +311,8 @@ function doAnimationScoreUpdate() {
 	});
 
 	stage.add(samples_layer);
-
-
+	stage.add(red_line_layer);
+	stage.add(drag_inform_layer);
+	stage.add(big_text_layer);
 
 }

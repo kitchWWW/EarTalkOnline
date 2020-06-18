@@ -1,19 +1,25 @@
 div.ex3 {
-  background-color: lightblue;
+  background-color: #8CDDFC;
   width: 100%;
   height: 110px;
   overflow: auto;
   overflow-x: scroll;
 }
+#page-container {
+  position: relative;
+  min-height: 100vh;
+}
 
+#content-wrap {
+  padding-bottom: 5rem;    /* Footer height */
+}
 
-.footer {
-  position: fixed;
-  left: 0;
+#footer {
+  text-align: center;
+  position: absolute;
   bottom: 0;
   width: 100%;
-  color: black;
-  text-align: center;
+  height: 5rem;            /* Footer height */
 }
 
 h3{
@@ -27,3 +33,14 @@ h3{
 }
 
 span.avoidwrap { display:inline-block; }
+
+
+section {
+  display: flex;
+}
+article {
+  margin: 1px;
+  flex:1
+}
+
+body{ background-color: #f0f0f0;}

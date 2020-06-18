@@ -26,19 +26,19 @@ function writeToHistory(user, sample, action) {
   } else {
     bits = ['', 'Anon'];
   }
-  var actionLog = bits[1] + " " + action + " " + sample+'\n';
+  var actionLog = bits[1] + " " + action + " " + sample + '\n';
   console.log(actionLog);
   fs.appendFile("server.log", actionLog, function(err) {});
 }
 
 
-function writeToChat(user,chat_text) {
+function writeToChat(user, chat_text) {
   if (user) {
     var bits = user.split("=|=|=|=|=");
   } else {
     bits = ['', 'Anon'];
   }
-  var chatLog = bits[1] + ": " + chat_text+'\n';
+  var chatLog = bits[1] + ": " + chat_text + '\n';
   console.log(chatLog);
   console.log("***" + Date.now() + " chat: " + chatLog);
   fs.appendFile("chat.log", chatLog, function(err) {});
@@ -111,7 +111,9 @@ var server = http.createServer(function(request, response) {
         });
         response.write(JSON.stringify(files_names));
         response.end();
+        return;
       });
+      return;
     }
 
     var uri = url.parse(request.url).pathname,
@@ -120,7 +122,47 @@ var server = http.createServer(function(request, response) {
     var url_parts = url.parse(request.url, true);
     var query = url_parts.query;
     serverLog(stripName(query.id));
-
+    // do the history shit!
+    if (uri == "/score.json" && query.timeOffset != 0) {
+      fs.readdir(path.join(process.cwd(), 'old_scores'), function(err, files) {
+        //handling error
+        if (err) {
+          return console.log('Unable to scan directory: ' + err);
+        }
+        existingFileTimestamps = [];
+        //listing all files using forEach
+        files.forEach(function(file) {
+          existingFileTimestamps.push(file.replace(/\D/g, ''))
+        });
+        existingFileTimestamps.sort();
+        targetTime = Date.now() - parseInt(query.timeOffset)
+        var timestampToUse = '';
+        existingFileTimestamps.forEach(function(timestamp) {
+          if (parseInt(timestamp) < targetTime) {
+            timestampToUse = timestamp
+          }
+        })
+        console.log('score_' + timestampToUse + '.json')
+        if (timestampToUse != '') {
+          filename = path.join(process.cwd(), 'old_scores/score_' + timestampToUse + '.json');
+          fs.readFile(filename, "binary", function(err, file) {
+            if (err) {
+              response.writeHead(500, {
+                "Content-Type": "text/plain"
+              });
+              response.write(err + "\n");
+              response.end();
+              return;
+            }
+            response.writeHead(200);
+            response.write(file, "binary");
+            response.end();
+            return;
+          });
+        }
+      });
+      return;
+    }
     fs.exists(filename, function(exists) {
       if (!exists) {
         response.writeHead(404, {
@@ -181,7 +223,7 @@ var server = http.createServer(function(request, response) {
         response.end();
       });
 
-    }else if (request.url.startsWith("/chat")) {
+    } else if (request.url.startsWith("/chat")) {
       var requestBody = '';
       request.on('data', function(data) {
         requestBody += data;
@@ -277,32 +319,6 @@ var server = http.createServer(function(request, response) {
             let data_to_write = JSON.stringify(scoreJson);
             fs.writeFileSync('score.json', data_to_write);
             writeToHistory(query.id, new_sample_id, 'uploaded');
-          })
-          response.writeHead(200, {
-            'content-type': 'text/plain'
-          });
-          response.write(new_sample_id);
-          response.end();
-        });
-      });
-    } else if (request.url.startsWith("/handsUpload")) {
-      // parse a file upload
-      var form = new formidable.IncomingForm();
-      form.parse(request, function(err, fields, files) {
-        console.log(fields);
-        console.log(files);
-        console.log(err);
-
-        // figure out what sample number it should be
-        fs.readdir('hands/samples', (err, files_in_folder) => {
-          var howMany = files_in_folder.length;
-          var name_to_use = files['upload'].name;
-          if (name_to_use == 'blob') {
-            name_to_use = getName(query.id);
-          }
-          var new_sample_id = 's' + howMany + '_' + name_to_use + '.wav';
-          copyFile(files['upload'].path, 'hands/samples', new_sample_id, () => {
-            console.log("wow ok something new here too");
           })
           response.writeHead(200, {
             'content-type': 'text/plain'

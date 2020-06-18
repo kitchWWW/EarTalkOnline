@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="go.css">
     <style>
     body {
     margin: 0;
@@ -18,73 +18,85 @@
     </style>
   </head>
   <body>
-    <div id="allInteraction">
-      <div id="container" style="border-style: solid; border-width: 0px; background-color: white"></div>
-      <div class="row" style="margin:10px;">
-        <div class="col-sm-4">
-          <div id="show_for_master_viewer">
-            <div style="text-align: center;">
-              <button id="myMuteButton" onclick="doMute()" class="btn btn-danger">mute</button>
-            </div>
-            <br>
-            <div class="d-flex justify-content-center">
-              <div class="p-2  bd-highlight">
-                <button id="startRecordButton" type="button" class="btn btn-secondary" onclick="startRecording()"> Record from microphone</button>
-                <button id="stopRecordButton" type="button" class="btn btn-secondary" onclick="stopRecording()" style="display:none;">Stop</button>
-              </div>
-              <div class="p-2  bd-highlight">
-                <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post" style="display:inline;">
-                  <label class="btn btn-secondary">
-                    Upload <span class="avoidwrap">(max 100mb)</span><input id="file" type="file" name="upload" hidden required>
-                  </label>
-                </form>
-                <input type="submit" value="Upload" hidden>
-              </div>
-            </div>
-          </div>
+    <div id="headding" style="margin: 2px">
+   <section>
+  <article>      <a href="/index.html" style="color:black">< Home</a>
+</article>
+  <article style="text-align: center;">Ear Talk: Neverending</article>
+  <article>&nbsp;</article>
+</section>
+     </div>
+  <div id="allInteraction">
+    <div id="container" style="border-style: solid; border-width: 0px; background-color: white"></div>
+    <div class="row" style="margin:10px;">
+      <div class="col-sm-4">
+        <div id="show_for_master_viewer">
           <div style="text-align: center;">
-            <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Role: <span id="myActiveRole"> </span>
-              </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" onclick="paramChange('volume')">Volume Master</a>
-                <a class="dropdown-item" onclick="paramChange('pan')">Pan Master</a>
-                <a class="dropdown-item" onclick="paramChange('distort')">Distortion Master</a>
-                <a class="dropdown-item" onclick="paramChange('lowpass')">Clarity Master</a>
-              </div>
+            <button id="myMuteButton" onclick="doMute()" class="btn btn-danger">mute</button>
+          </div>
+          <br>
+          <div class="d-flex justify-content-center">
+            <!-- <div class="p-2  bd-highlight">
+              <button id="startRecordButton" type="button" class="btn btn-secondary" onclick="startRecording()"> Record from microphone</button>
+              <button id="stopRecordButton" type="button" class="btn btn-secondary" onclick="stopRecording()" style="display:none;">Stop</button>
+            </div> -->
+            <div class="p-2  bd-highlight">
+              <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post" style="display:inline;">
+                <label class="btn btn-secondary">
+                  Upload <span class="avoidwrap">(max 1mb)</span><input id="file" type="file" name="upload" hidden required>
+                </label>
+              </form>
+              <input type="submit" value="Upload" hidden>
             </div>
           </div>
         </div>
-        <div class="col-sm-4">
-          Action History:<br />
-          <div id="history_log" class="ex3" style="white-space: pre-wrap;">
+        <div style="text-align: center;">
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Role: <span id="myActiveRole"> </span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" onclick="paramChange('volume')">Volume Master</a>
+              <a class="dropdown-item" onclick="paramChange('pan')">Pan Master</a>
+              <a class="dropdown-item" onclick="paramChange('distort')">Distortion Master</a>
+              <a class="dropdown-item" onclick="paramChange('lowpass')">Clarity Master</a>
+            </div>
           </div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        Action History:<br />
+        <div id="history_log" class="ex3" style="white-space: pre-wrap;">
+        </div>
+        <div id="select_screen_name_div">
           <br>
           Screen Name:
           <br>
-          <input type="text" id="fname" name="fname"><br>
+          <input type="text" id="fname" name="fname"><br/>
         </div>
-        <div class="col-sm-4">
-          Chat:<br />
-          <div id="chat_log" class="ex3" style="white-space: pre-wrap;">
-          </div>
-          <br>
+      </div>
+      <div class="col-sm-4">
+        Chat:<br />
+        <div id="chat_log" class="ex3" style="white-space: pre-wrap;">
+        </div>
+        <div id="send_message_div">
+          <br/>
           Send Message:
-          <br>
-          <input type="text" id="message_box" name="message_box"><br>
+          <br/>
+          <input type="text" id="message_box" name="message_box" style="width: 100%"><br/>
         </div>
       </div>
     </div>
-    <br>
   </div>
-  <script src="customlibs.js"></script>
-  <script src="corelogic.js"></script>
-  <script src="start.js"></script>
-  <script src="NoSleep.js"></script>
-  <script src='konva_visual.js'></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <br>
+</div>
+<script src="customlibs.js"></script>
+<script src="corelogic.js"></script>
+<script src="start.js"></script>
+<script src="NoSleep.js"></script>
+<script src='konva_visual.js'></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 </body>
 </html>

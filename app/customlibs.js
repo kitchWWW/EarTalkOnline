@@ -121,6 +121,9 @@ function sendFDtoServer(fd) {
   request.onload = function() { // request successful
     // we can use server response to our request now
     console.log(request.responseText);
+    if(request.responseText.includes("Request Entity Too Large")){
+      alert("Warning: file too large.");
+    }
   };
 
   request.onerror = function() {
@@ -171,10 +174,3 @@ const recordAudio = () => {
   });
 };
 
-
-function firstView() {
-  MASTER_GROUP.volume = 1;
-  IS_IN_MUTE = false;
-  window.setTimeout(addHelpText, 300);
-  window.setTimeout(removeHelpText, 3200);
-}

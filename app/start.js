@@ -1,5 +1,10 @@
 // all the shit that you have to actually execute
 
+function firstView() {
+  MASTER_GROUP.volume = 1;
+  IS_IN_MUTE = false;
+  window.setTimeout(doHelpText, 300);
+}
 
 // set the button to be the score:
 document.getElementById("fileUploadForm").onchange = function() {
@@ -44,6 +49,8 @@ IS_FIRST_TIME_LOADING_CHAT = true;
 MY_PARAM_TO_CONTROL = 'volume'; // should be volume or pan for now, something else maybe later. 
 var recorder = null;
 
+TIME_OFFSET = 0;
+
 var reverb = new Pizzicato.Effects.Reverb({
 	time: 1.45,
 	decay: 1,
@@ -51,7 +58,7 @@ var reverb = new Pizzicato.Effects.Reverb({
 	mix: 0
 });
 
-var IS_MASTER_VIEWER = false;
+var VIEWER_MODE = '';
 
 var MASTER_GROUP = new Pizzicato.Group([]);
 MASTER_GROUP.addEffect(reverb);
@@ -63,9 +70,19 @@ updateSessionID();
 // the valid final state of the dealio
 doInit();
 MASTER_GROUP.volume = 0;
+updateForViewMode();
 window.setInterval(masterIntervalStepper, GLOBAL_TIMESTEP);
 window.setInterval(masterScoreRefresh, GLOBAL_REFRESH);
-updateForMasterViewer();
+
+
+
+
+
+
+
+// hide the record button because we aren't on https
+// document.getElementById('startRecordButton').style.display="none";
+
 
 
 // and now that everything is ready to go and loaded, we "show" it.
