@@ -114,6 +114,28 @@ var server = http.createServer(function(request, response) {
         return;
       });
       return;
+    } else if (request.url.startsWith("/teliphonicsListRecordings")) {
+      const directoryPath = path.join(__dirname, 'otherProjects/teliphonics/recordings');
+      const files_names = [];
+      fs.readdir(directoryPath, function(err, files) {
+        //handling error
+        if (err) {
+          return console.log('Unable to scan directory: ' + err);
+        }
+        //listing all files using forEach
+        files.forEach(function(file) {
+          // Do whatever you want to do with the file
+          console.log(file);
+          files_names.push(file);
+        });
+        response.writeHead(200, {
+          'content-type': 'text/plain'
+        });
+        response.write(JSON.stringify(files_names));
+        response.end();
+        return;
+      });
+      return;
     }
 
     var uri = url.parse(request.url).pathname,
@@ -326,6 +348,78 @@ var server = http.createServer(function(request, response) {
           response.write(new_sample_id);
           response.end();
         });
+      });
+    } else if (request.url.startsWith("/teliphonicsUpload")) {
+      // parse a file upload
+      var form = new formidable.IncomingForm();
+      form.maxFileSize = 200 * 1024 * 1024; // 200mb max file size. Thing says 100, so we give people some buffer.
+      form.parse(request, function(err, fields, files) {
+        console.log(fields);
+        console.log(files);
+        console.log(err);
+
+        var url_parts = url.parse(request.url, true);
+        var query = url_parts.query;
+
+
+        // figure out what sample number it should be
+        fs.readdir('otherProjects/teliphonics/recordings_all/', (err, files_in_folder) => {
+          var howMany = files_in_folder.length;
+          var name_to_use = files['upload'].name;
+          if (name_to_use == 'blob') {
+            name_to_use = getName(query.id);
+          }
+          var new_sample_id = 's' + howMany + '_' + name_to_use;
+          copyFile(files['upload'].path, 'otherProjects/teliphonics/recordings_all/', new_sample_id, () => {
+            console.log("wow ok something new here too");
+            console.log("we've saved the response yay!");
+            // ideally also kick off some vetting processes being like "are they cursing?"
+          })
+          response.writeHead(200, {
+            'content-type': 'text/plain'
+          });
+          response.write(new_sample_id);
+          response.end();
+        });
+      });
+    } else if (request.url.startsWith("/teliphonicsSubmit")) {
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if (requestBody.length > 1e20) {
+          response.writeHead(413, 'Request Entity Too Large', {
+            'Content-Type': 'text/html'
+          });
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        // should probably do something to make sure this is an atomic function.
+        var data = JSON.parse(requestBody);
+        console.log(data);
+        var parentId = data.idParent;
+        var childId = data.idChild;
+
+        // step 1: copy the recording into the main file of recordings
+        copyFile(
+          'otherProjects/teliphonics/recordings_all/s' + childId + '_Anon',
+          'otherProjects/teliphonics/recordings/', 's' + childId + '_Anon', () => {
+
+            // step 2: read in the child path tree for the previous tr
+            let rawdata = fs.readFileSync('otherProjects/teliphonics/tree.json');
+            let treeJson = JSON.parse(rawdata);
+            treeJson['s' + childId + '_Anon'] = 's' + parentId + '_Anon'
+            let data_to_write = JSON.stringify(treeJson);
+            fs.writeFileSync('otherProjects/teliphonics/tree.json', data_to_write);
+            
+            response.writeHead(200, {
+              "Content-Type": "text/plain"
+            });
+            response.write("{}");
+            response.end();
+            return;
+          });
+        return;
       });
     } else {
       response.writeHead(404, 'Resource Not Found', {
