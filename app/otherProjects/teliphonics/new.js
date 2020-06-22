@@ -5,17 +5,7 @@ function getUrlVars() {
   });
   return vars;
 }
-console.log(getUrlVars())
-var clipToUse = getUrlVars()['clipToUse']
-console.log(clipToUse);
-var forVerification = parseInt(clipToUse)
-if (forVerification >= 0) {
-  var soundClipToUse = new Pizzicato.Sound('recordings/s' + clipToUse + '_Anon', function() {
-    console.log("got it!")
-  })
-} else {
-  alert("invalid URL!")
-}
+
 var currentRecordingToSave = 0;
 var currentRecordingForPlayback = null;
 
@@ -27,26 +17,19 @@ function listenToRecording() {
 }
 
 function rerecord() {
-  currentRecordingForPlayback.stop();
+  document.getElementById("listenToPast").style.display = "none";
+  if(currentRecordingForPlayback!=null){
+    currentRecordingForPlayback.stop();
+  }
   startRecordProcess();
   document.getElementById("finishedRecording").style.display = "none";
 }
 
 function submit() {
-  postData('/teliphonicsSubmit', {
-    idParent: clipToUse,
-    idChild: currentRecordingToSave
+  postData('/teliphonicsNew', {
+    id: currentRecordingToSave
   })
   window.location.href = '/otherProjects/teliphonics/history.html?clipToUse=' + currentRecordingToSave
-}
-
-function startTeliphonicsProcess() {
-  document.getElementById("listenToPast").style.display = "none";
-  soundClipToUse.play()
-  // FIX ME BEFORE PUSHING, change 2000 to 10000
-  window.setTimeout(startRecordProcess, 10000); // play the ten second recording
-  document.getElementById("instructions").innerHTML = "Listen!";
-  document.getElementById("countdownDisplay").innerHTML = "";
 }
 
 function startRecordProcess() {
@@ -131,7 +114,7 @@ const recordAudio = () => {
 };
 
 function sendFDtoServer(fd) {
-  var url = "/teliphonicsUpload?respondingToId=" + clipToUse;
+  var url = "/teliphonicsUpload";
   var request = new XMLHttpRequest();
   request.open('POST', url, true);
   request.onload = function() { // request successful

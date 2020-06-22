@@ -37,10 +37,15 @@ function askForRecordings() {
 
 function joinRandom() {
 	idToUse = allRecordingOptions[Math.floor(Math.random() * allRecordingOptions.length)];
-	window.location.replace(window.location.origin + '/otherProjects/teliphonics/play.html?clipToUse=' + idToUse);
+	window.location.replace(window.location.origin + '/otherProjects/teliphonics/play.html?clipToUse=' + idToUse+'&jumpToEndOfChain=true');
 }
 
 function joinMostRecent() {
-	idToUse = Math.max(allRecordingOptions);
-	window.location.replace(window.location.origin + '/otherProjects/teliphonics/play.html?clipToUse=' + idToUse);
+	idToUse = Math.max(...allRecordingOptions);
+	window.location.replace(window.location.origin + '/otherProjects/teliphonics/play.html?clipToUse=' + idToUse+'&jumpToEndOfChain=true');
+}
+
+
+function startNew() {
+	window.location.replace(window.location.origin + '/otherProjects/teliphonics/new.html');
 }

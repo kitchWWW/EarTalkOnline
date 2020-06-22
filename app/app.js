@@ -361,7 +361,6 @@ var server = http.createServer(function(request, response) {
         var url_parts = url.parse(request.url, true);
         var query = url_parts.query;
 
-
         // figure out what sample number it should be
         fs.readdir('otherProjects/teliphonics/recordings_all/', (err, files_in_folder) => {
           var howMany = files_in_folder.length;
@@ -412,6 +411,38 @@ var server = http.createServer(function(request, response) {
             let data_to_write = JSON.stringify(treeJson);
             fs.writeFileSync('otherProjects/teliphonics/tree.json', data_to_write);
             
+            response.writeHead(200, {
+              "Content-Type": "text/plain"
+            });
+            response.write("{}");
+            response.end();
+            return;
+          });
+        return;
+      });
+    }  else if (request.url.startsWith("/teliphonicsNew")) {
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if (requestBody.length > 1e20) {
+          response.writeHead(413, 'Request Entity Too Large', {
+            'Content-Type': 'text/html'
+          });
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        // should probably do something to make sure this is an atomic function.
+        var data = JSON.parse(requestBody);
+        console.log(data);
+        var id = data.id;
+        // step 1: copy the recording into the main file of recordings
+        copyFile(
+          'otherProjects/teliphonics/recordings_all/s' + id + '_Anon',
+          'otherProjects/teliphonics/recordings/', 's' + id + '_Anon', () => {
+
+            // nothing to do to add to tree since will be a root node!
+
             response.writeHead(200, {
               "Content-Type": "text/plain"
             });
