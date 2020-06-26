@@ -1,11 +1,74 @@
 import os
-
-# go to /listAllScores and copy paste:
-
-# url = http://www.eartalk.org
-url = 'localhost:3000'
-scores = [".DS_Store","score_1589594236903.json","score_1589595278752.json","score_1589595282474.json","score_1592453874751.json","score_1592453878945.json","score_1592453883579.json","score_1592453895244.json","score_1592453908659.json","score_1592453914124.json","score_1592453947038.json","score_1592453950227.json","score_1592453994444.json","score_1592454652511.json","score_1592454653355.json","score_1592454786366.json","score_1592454790476.json","score_1592454796298.json","score_1592455014877.json","score_1592455017490.json","score_1592455019229.json","score_1592455021970.json","score_1592455025925.json","score_1592455833269.json","score_1592455834799.json","score_1592455836070.json","score_1592456184157.json","score_1592456753484.json","score_1592456802053.json","score_1592458685684.json","score_1592458688516.json","score_1592458692440.json","score_1592458693709.json","score_1592458974027.json","score_1592459295397.json"]
+import json
+import time
+import unicodedata
+import requests
 
 
-for s in scores:
-	os.system("curl "+url+'/old_scores/'+s+' > '+s)
+
+
+x = requests.get('http://www.eartalk.org/listAllScores')
+x2 = json.loads(x.content)
+print(x2);
+url = 'http://www.eartalk.org';
+out='output/'
+
+
+data = requests.get(url+'/server.log')
+outFD = open(out+'server.log','w')
+outFD.write(data.content)
+outFD.close()
+
+data = requests.get(url+'/chat.log')
+outFD = open(out+'chat.log','w')
+outFD.write(data.content)
+outFD.close()
+
+data = requests.get(url+'/score.json?id=id_bnleu667so5=|=|=|=|=Brian&timeOffset=0')
+outFD = open(out+'score.json','w')
+outFD.write(data.content)
+outFD.close()
+
+try:
+	os.mkdir(out+'/samples')
+except:
+	pass
+try:
+	os.mkdir(out+'/scores')
+except:
+	pass
+
+
+allAudioFiles = []
+
+for s in x2:
+	s = unicodedata.normalize('NFKD', s).encode('ascii', 'ignore')
+
+	if s.startswith('.DS_Store'):
+		continue
+	data = requests.get(url+'/old_scores/'+s)
+	score = json.loads(data.content)
+	outFD = open(out+'scores/'+s,'w')
+	outFD.write(data.content)
+	outFD.close()
+	for item in score:
+		allAudioFiles.append(item)
+	allAudioFiles = list(set(allAudioFiles))
+
+print allAudioFiles
+
+for a in allAudioFiles:
+	data = requests.get(url+'/samples/'+a)
+	outFD = open(out+'samples/'+a,'wb')
+	outFD.write(data.content)
+	outFD.close()
+
+
+
+
+
+os.system('mv '+out+'/chat.log ../../app/')
+os.system('mv '+out+'/server.log ../../app/')
+os.system('mv '+out+'/score.json ../../app/')
+os.system('mv '+out+'/samples/* ../../app/samples/')
+os.system('mv '+out+'/scores/* ../../app/old_scores/')
