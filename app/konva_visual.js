@@ -207,6 +207,7 @@ function doAnimationScoreUpdate() {
 		});
 		var filename_to_display = fileName.split("_")
 		filename_to_display = filename_to_display.slice(1, filename_to_display.length).join("_")
+		filename_to_display = filename_to_display.split(".")[0]
 		var simpleText = new Konva.Text({
 			x: x_start + 5,
 			y: y_start + 5,

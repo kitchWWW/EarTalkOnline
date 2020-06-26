@@ -4,6 +4,10 @@ var http = require("http"),
   fs = require("fs")
 port = process.env.PORT || 3000;
 
+
+
+var ffmpeg = require('fluent-ffmpeg');
+
 var formidable = require('formidable');
 
 const runSpawn = require('child_process').spawn;
@@ -12,8 +16,6 @@ String.prototype.replaceAll = function(search, replacement) {
   var target = this;
   return target.split(search).join(replacement);
 };
-
-fs.writeFile("server.log", "Starting Log...\n", function(err) {});
 
 function serverLog(data) {
   console.log("***" + Date.now() + " " + data);
@@ -62,10 +64,6 @@ function getName(id) {
 
 //copy the $file to $dir2
 var copyFile = (file, dir2, new_name, callbackFunc) => {
-  //include the fs, path modules
-  var fs = require('fs');
-  var path = require('path');
-
   //gets file name and adds it to dir2
   var f = path.basename(file);
   var source = fs.createReadStream(file);
@@ -79,6 +77,20 @@ var copyFile = (file, dir2, new_name, callbackFunc) => {
   source.on('error', function(err) {
     console.log(err);
   });
+};
+
+
+
+//copy the $file to $dir2
+var copyFileWithFFMPEG = (file, dir2, new_name, callbackFunc) => {
+  ffmpeg(file).on('error', function(err) {
+      console.log('An error occurred: ' + err.message);
+    })
+    .on('end', function() {
+      console.log('Processing finished !');
+      callbackFunc();
+
+    }).save(dir2 + '/' + new_name + '.mp3');
 };
 
 
@@ -114,8 +126,8 @@ var server = http.createServer(function(request, response) {
         return;
       });
       return;
-    } else if (request.url.startsWith("/teliphonicsListRecordings")) {
-      const directoryPath = path.join(__dirname, 'otherProjects/teliphonics/recordings');
+    } else if (request.url.startsWith("/teleListRecordings")) {
+      const directoryPath = path.join(__dirname, 'otherProjects/tele/recordings');
       const files_names = [];
       fs.readdir(directoryPath, function(err, files) {
         //handling error
@@ -125,6 +137,9 @@ var server = http.createServer(function(request, response) {
         //listing all files using forEach
         files.forEach(function(file) {
           // Do whatever you want to do with the file
+          if (file.startsWith('.')) {
+            return;
+          }
           console.log(file);
           files_names.push(file);
         });
@@ -324,8 +339,16 @@ var server = http.createServer(function(request, response) {
           if (name_to_use == 'blob') {
             name_to_use = getName(query.id);
           }
+          if (name_to_use.toUpperCase().endsWith('.WAV') ||
+            name_to_use.toUpperCase().endsWith('.MP3') ||
+            name_to_use.toUpperCase().endsWith('.M4A') ||
+            name_to_use.toUpperCase().endsWith('.OGG')) {
+            name_to_use = name_to_use.substring(0, name_to_use.length - 4);
+          }
+          name_to_use = name_to_use + '.mp3';
           var new_sample_id = 's' + howMany + '_' + name_to_use;
-          copyFile(files['upload'].path, 'samples', new_sample_id, () => {
+          console.log("WAAAATTTT");
+          copyFileWithFFMPEG(files['upload'].path, 'samples', new_sample_id, () => {
             console.log("wow ok something new here too");
 
             let rawdata = fs.readFileSync('score.json');
@@ -349,7 +372,7 @@ var server = http.createServer(function(request, response) {
           response.end();
         });
       });
-    } else if (request.url.startsWith("/teliphonicsUpload")) {
+    } else if (request.url.startsWith("/teleUpload")) {
       // parse a file upload
       var form = new formidable.IncomingForm();
       form.maxFileSize = 200 * 1024 * 1024; // 200mb max file size. Thing says 100, so we give people some buffer.
@@ -362,14 +385,14 @@ var server = http.createServer(function(request, response) {
         var query = url_parts.query;
 
         // figure out what sample number it should be
-        fs.readdir('otherProjects/teliphonics/recordings_all/', (err, files_in_folder) => {
+        fs.readdir('otherProjects/tele/recordings_all/', (err, files_in_folder) => {
           var howMany = files_in_folder.length;
           var name_to_use = files['upload'].name;
           if (name_to_use == 'blob') {
             name_to_use = getName(query.id);
           }
           var new_sample_id = 's' + howMany + '_' + name_to_use;
-          copyFile(files['upload'].path, 'otherProjects/teliphonics/recordings_all/', new_sample_id, () => {
+          copyFileWithFFMPEG(files['upload'].path, 'otherProjects/tele/recordings_all/', new_sample_id, () => {
             console.log("wow ok something new here too");
             console.log("we've saved the response yay!");
             // ideally also kick off some vetting processes being like "are they cursing?"
@@ -381,7 +404,7 @@ var server = http.createServer(function(request, response) {
           response.end();
         });
       });
-    } else if (request.url.startsWith("/teliphonicsSubmit")) {
+    } else if (request.url.startsWith("/teleSubmit")) {
       var requestBody = '';
       request.on('data', function(data) {
         requestBody += data;
@@ -401,16 +424,16 @@ var server = http.createServer(function(request, response) {
 
         // step 1: copy the recording into the main file of recordings
         copyFile(
-          'otherProjects/teliphonics/recordings_all/s' + childId + '_Anon',
-          'otherProjects/teliphonics/recordings/', 's' + childId + '_Anon', () => {
+          'otherProjects/tele/recordings_all/s' + childId + '_Anon.mp3',
+          'otherProjects/tele/recordings/', 's' + childId + '_Anon.mp3', () => {
 
             // step 2: read in the child path tree for the previous tr
-            let rawdata = fs.readFileSync('otherProjects/teliphonics/tree.json');
+            let rawdata = fs.readFileSync('otherProjects/tele/tree.json');
             let treeJson = JSON.parse(rawdata);
-            treeJson['s' + childId + '_Anon'] = 's' + parentId + '_Anon'
+            treeJson['s' + childId + '_Anon.mp3'] = 's' + parentId + '_Anon.mp3'
             let data_to_write = JSON.stringify(treeJson);
-            fs.writeFileSync('otherProjects/teliphonics/tree.json', data_to_write);
-            
+            fs.writeFileSync('otherProjects/tele/tree.json', data_to_write);
+
             response.writeHead(200, {
               "Content-Type": "text/plain"
             });
@@ -420,7 +443,7 @@ var server = http.createServer(function(request, response) {
           });
         return;
       });
-    }  else if (request.url.startsWith("/teliphonicsNew")) {
+    } else if (request.url.startsWith("/teleNew")) {
       var requestBody = '';
       request.on('data', function(data) {
         requestBody += data;
@@ -438,11 +461,8 @@ var server = http.createServer(function(request, response) {
         var id = data.id;
         // step 1: copy the recording into the main file of recordings
         copyFile(
-          'otherProjects/teliphonics/recordings_all/s' + id + '_Anon',
-          'otherProjects/teliphonics/recordings/', 's' + id + '_Anon', () => {
-
-            // nothing to do to add to tree since will be a root node!
-
+          'otherProjects/tele/recordings_all/s' + id + '_Anon.mp3',
+          'otherProjects/tele/recordings/', 's' + id + '_Anon.mp3', () => {
             response.writeHead(200, {
               "Content-Type": "text/plain"
             });
@@ -450,6 +470,33 @@ var server = http.createServer(function(request, response) {
             response.end();
             return;
           });
+        return;
+      });
+    } else if (request.url.startsWith("/dance")) {
+      var requestBody = '';
+      request.on('data', function(data) {
+        requestBody += data;
+        if (requestBody.length > 1e20) {
+          response.writeHead(413, 'Request Entity Too Large', {
+            'Content-Type': 'text/html'
+          });
+          response.end('<!doctype html><html><head><title>413</title></head><body>413: Request Entity Too Large</body></html>');
+        }
+      });
+      request.on('end', function() {
+        // should probably do something to make sure this is an atomic function.
+        var data = JSON.parse(requestBody);
+        console.log(data);
+        var id = data.id;
+
+        let data_to_write = JSON.stringify(data);
+        fs.writeFileSync('otherProjects/dance/position.json', data_to_write);
+        // step 1: copy the recording into the main file of recordings
+        response.writeHead(200, {
+          "Content-Type": "text/plain"
+        });
+        response.write("{}");
+        response.end();
         return;
       });
     } else {
