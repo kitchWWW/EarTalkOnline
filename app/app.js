@@ -5,9 +5,6 @@ var http = require("http"),
 port = process.env.PORT || 3000;
 
 
-
-var ffmpeg = require('fluent-ffmpeg');
-
 var formidable = require('formidable');
 
 const runSpawn = require('child_process').spawn;
@@ -78,21 +75,6 @@ var copyFile = (file, dir2, new_name, callbackFunc) => {
     console.log(err);
   });
 };
-
-
-
-//copy the $file to $dir2
-var copyFileWithFFMPEG = (file, dir2, new_name, callbackFunc) => {
-  ffmpeg(file).on('error', function(err) {
-      console.log('An error occurred: ' + err.message);
-    })
-    .on('end', function() {
-      console.log('Processing finished !');
-      callbackFunc();
-
-    }).save(dir2 + '/' + new_name + '.mp3');
-};
-
 
 
 var server = http.createServer(function(request, response) {
@@ -339,16 +321,16 @@ var server = http.createServer(function(request, response) {
           if (name_to_use == 'blob') {
             name_to_use = getName(query.id);
           }
-          if (name_to_use.toUpperCase().endsWith('.WAV') ||
-            name_to_use.toUpperCase().endsWith('.MP3') ||
-            name_to_use.toUpperCase().endsWith('.M4A') ||
-            name_to_use.toUpperCase().endsWith('.OGG')) {
-            name_to_use = name_to_use.substring(0, name_to_use.length - 4);
-          }
-          name_to_use = name_to_use + '.mp3';
+          name_to_use = name_to_use.replaceAll(' ','_');
+          // if (name_to_use.toUpperCase().endsWith('.WAV') ||
+          //   name_to_use.toUpperCase().endsWith('.MP3') ||
+          //   name_to_use.toUpperCase().endsWith('.M4A') ||
+          //   name_to_use.toUpperCase().endsWith('.OGG')) {
+          //   name_to_use = name_to_use.substring(0, name_to_use.length - 4);
+          // }
           var new_sample_id = 's' + howMany + '_' + name_to_use;
           console.log("WAAAATTTT");
-          copyFileWithFFMPEG(files['upload'].path, 'samples', new_sample_id, () => {
+          copyFile(files['upload'].path, 'samples', new_sample_id, () => {
             console.log("wow ok something new here too");
 
             let rawdata = fs.readFileSync('score.json');
@@ -392,7 +374,7 @@ var server = http.createServer(function(request, response) {
             name_to_use = getName(query.id);
           }
           var new_sample_id = 's' + howMany + '_' + name_to_use;
-          copyFileWithFFMPEG(files['upload'].path, 'otherProjects/tele/recordings_all/', new_sample_id, () => {
+          copyFile(files['upload'].path, 'otherProjects/tele/recordings_all/', new_sample_id, () => {
             console.log("wow ok something new here too");
             console.log("we've saved the response yay!");
             // ideally also kick off some vetting processes being like "are they cursing?"
@@ -424,13 +406,13 @@ var server = http.createServer(function(request, response) {
 
         // step 1: copy the recording into the main file of recordings
         copyFile(
-          'otherProjects/tele/recordings_all/s' + childId + '_Anon.mp3',
-          'otherProjects/tele/recordings/', 's' + childId + '_Anon.mp3', () => {
+          'otherProjects/tele/recordings_all/s' + childId + '_Anon',
+          'otherProjects/tele/recordings/', 's' + childId + '_Anon', () => {
 
             // step 2: read in the child path tree for the previous tr
             let rawdata = fs.readFileSync('otherProjects/tele/tree.json');
             let treeJson = JSON.parse(rawdata);
-            treeJson['s' + childId + '_Anon.mp3'] = 's' + parentId + '_Anon.mp3'
+            treeJson['s' + childId + '_Anon'] = 's' + parentId + '_Anon'
             let data_to_write = JSON.stringify(treeJson);
             fs.writeFileSync('otherProjects/tele/tree.json', data_to_write);
 
@@ -461,8 +443,8 @@ var server = http.createServer(function(request, response) {
         var id = data.id;
         // step 1: copy the recording into the main file of recordings
         copyFile(
-          'otherProjects/tele/recordings_all/s' + id + '_Anon.mp3',
-          'otherProjects/tele/recordings/', 's' + id + '_Anon.mp3', () => {
+          'otherProjects/tele/recordings_all/s' + id + '_Anon',
+          'otherProjects/tele/recordings/', 's' + id + '_Anon', () => {
             response.writeHead(200, {
               "Content-Type": "text/plain"
             });

@@ -40,7 +40,7 @@ async function getData(url = '') {
 }
 
 function makeIndexFromKey(index){
-	return 's'+index+'_Anon.mp3';
+	return 's'+index+'_Anon';
 }
 
 

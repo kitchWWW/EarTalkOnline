@@ -25,7 +25,7 @@ var currentRecordingToSave = 0;
 var currentRecordingForPlayback = null;
 
 function listenToRecording() {
-  currentRecordingForPlayback = new Pizzicato.Sound('recordings_all/s' + currentRecordingToSave + '_Anon.mp3', function() {
+  currentRecordingForPlayback = new Pizzicato.Sound('recordings_all/s' + currentRecordingToSave + '_Anon', function() {
     console.log("got it!")
     currentRecordingForPlayback.play()
   })
@@ -144,7 +144,7 @@ function sendFDtoServer(fd) {
   request.onload = function() { // request successful
     // we can use server response to our request now
     currentRecordingToSave = request.responseText.replace('s', '')
-    currentRecordingToSave = currentRecordingToSave.replace('_Anon.mp3', '')
+    currentRecordingToSave = currentRecordingToSave.replace('_Anon', '')
     currentRecordingToSave = parseInt(currentRecordingToSave)
     console.log(request.responseText);
     if (request.responseText.includes("Request Entity Too Large")) {

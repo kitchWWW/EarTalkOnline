@@ -22,11 +22,11 @@ outFD.close()
 tree = json.loads(data.content)
 
 try:
-	os.mkdir(out+'/recordings')
+	os.mkdir(out+'recordings')
 except:
 	pass
 try:
-	os.mkdir(out+'/recordings_all')
+	os.mkdir(out+'recordings_all')
 except:
 	pass
 
@@ -34,7 +34,7 @@ maxItoCountTo = 0;
 shouldContinue=0
 i = 0
 while shouldContinue<10:
-	url2use = url+'recordings_all/s'+str(i)+'_Anon'
+	url2use = url+'recordings_all/s'+str(i)+'_Anon.mp3'
 	data = requests.get(url2use)
 	print(url2use)
 	print(data)
@@ -43,28 +43,28 @@ while shouldContinue<10:
 		i+=1
 		continue
 	print(data.status_code)
-	outFD = open(out+'recordings_all/s'+str(i)+'_Anon','wb')
+	outFD = open(out+'recordings_all/s'+str(i)+'_Anon.mp3','wb')
 	outFD.write(data.content)
 	outFD.close()
 	i+=1
 	maxItoCountTo = i
 
 for i in range(maxItoCountTo+10):
-	url2use = url+'recordings/s'+str(i)+'_Anon'
+	url2use = url+'recordings/s'+str(i)+'_Anon.mp3'
 	data = requests.get(url2use)
 	print(url2use)
 	if(data.status_code == 404):
 		continue
 	print(data.status_code)
-	outFD = open(out+'recordings/s'+str(i)+'_Anon','wb')
+	outFD = open(out+'recordings/s'+str(i)+'_Anon.mp3','wb')
 	outFD.write(data.content)
 	outFD.close()
 
 
 
 
-os.system('mv '+out+'/tree.json ../../app/otherProjects/tele/')
-os.system('mv '+out+'/recordings/* ../../app/otherProjects/tele/recordings')
-os.system('mv '+out+'/recordings_all/* ../../app/otherProjects/tele/recordings_all')
+os.system('mv '+out+'tree.json ../../app/otherProjects/tele/')
+os.system('mv '+out+'recordings/* ../../app/otherProjects/tele/recordings')
+os.system('mv '+out+'recordings_all/* ../../app/otherProjects/tele/recordings_all')
 
 

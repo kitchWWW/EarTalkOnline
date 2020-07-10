@@ -24,7 +24,7 @@ var currentRecordingToSave = 0;
 var currentRecordingForPlayback = null;
 
 function listenToRecording() {
-  currentRecordingForPlayback = new Pizzicato.Sound('recordings_all/s' + currentRecordingToSave + '_Anon.mp3', function() {
+  currentRecordingForPlayback = new Pizzicato.Sound('recordings_all/s' + currentRecordingToSave + '_Anon', function() {
     console.log("got it!")
     currentRecordingForPlayback.play()
   })
@@ -151,7 +151,7 @@ function sendFDtoServer(fd) {
   request.onload = function() { // request successful
     // we can use server response to our request now
     currentRecordingToSave = request.responseText.replace('s', '')
-    currentRecordingToSave = currentRecordingToSave.replace('_Anon.mp3', '')
+    currentRecordingToSave = currentRecordingToSave.replace('_Anon', '')
     currentRecordingToSave = parseInt(currentRecordingToSave)
     console.log(request.responseText);
     if (request.responseText.includes("Request Entity Too Large")) {
@@ -247,10 +247,10 @@ if (verified) {
         }
       }
       console.log(parentToChildMap);
-      var longestChain = longestChainForId('s' + clipToUse + '_Anon.mp3')
+      var longestChain = longestChainForId('s' + clipToUse + '_Anon')
       var candidateClip = longestChain[0];
       candidateClipId = candidateClip.replace('s', '');
-      candidateClipId = candidateClipId.replace('_Anon.mp3', '');
+      candidateClipId = candidateClipId.replace('_Anon', '');
       console.log(candidateClip);
       console.log(clipToUse);
       if (candidateClipId == clipToUse) {
@@ -263,7 +263,7 @@ if (verified) {
   }
 
 
-  var soundClipToUse = new Pizzicato.Sound('recordings/s' + clipToUse + '_Anon.mp3', function() {
+  var soundClipToUse = new Pizzicato.Sound('recordings/s' + clipToUse + '_Anon', function() {
     console.log("got it!")
   })
 

@@ -157,25 +157,6 @@ function draw() {
   }
 }
 
-window.onclick = function() {
-  let context = Pizzicato.context
-  let source = context.createBufferSource()
-  source.buffer = context.createBuffer(1, 1, 22050)
-  source.connect(context.destination)
-  source.start()
-
-
-  sineWave = new Pizzicato.Sound({
-    source: 'wave',
-    options: {
-      frequency: 440
-    }
-  });
-  sineWave.volume = .2;
-  sineWave.play();
-}
-
-
 function noteToFreq(note) {
   let a = 440; //frequency of A (coomon value is 440Hz)
   return (a / 32) * (2 ** ((note - 9) / 12));
