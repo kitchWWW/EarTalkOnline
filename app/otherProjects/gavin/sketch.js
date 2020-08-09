@@ -146,7 +146,7 @@ function draw() {
     console.log(right_arm_angle);
 
     postData('/dance',{
-      id:'1234',
+      id:'2',
       left_elbow_angle:left_elbow_angle,
       right_elbow_angle:right_elbow_angle,
       left_arm_angle:left_arm_angle,

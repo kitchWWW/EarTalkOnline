@@ -108,6 +108,42 @@ var server = http.createServer(function(request, response) {
         return;
       });
       return;
+    }else if (request.url.startsWith("/getCustomCode")) {
+      console.log('custom code time!');
+      // parse a file upload
+      //requiring path and fs modules
+      //joining path of directory 
+      //passsing directoryPath and callback function
+      const directoryPath = path.join(__dirname, 'otherProjects/positions/');
+      const files_names = [];
+      fs.readdir(directoryPath, function(err, files) {
+        //handling error
+        if (err) {
+          return console.log('Unable to scan directory: ' + err);
+        }
+        //listing all files using forEach
+        files.forEach(function(file) {
+          // Do whatever you want to do with the file
+          console.log(file);
+          files_names.push(file);
+        });
+        validCodeParts = 'ABCDEFGHJKLMNPQRSTUVWXYZ3456789'
+        do{
+          a = validCodeParts.substring(Math.floor(Math.random() * Math.floor(validCodeParts.length))).substring(0,1);
+          b = validCodeParts.substring(Math.floor(Math.random() * Math.floor(validCodeParts.length))).substring(0,1); 
+          c = validCodeParts.substring(Math.floor(Math.random() * Math.floor(validCodeParts.length))).substring(0,1); 
+          d = validCodeParts.substring(Math.floor(Math.random() * Math.floor(validCodeParts.length))).substring(0,1); 
+          candidateCode = a+b+c+d
+        }while(files_names.indexOf(candidateCode) >= 0)
+
+        response.writeHead(200, {
+          'content-type': 'text/plain'
+        });
+        response.write(JSON.stringify(candidateCode));
+        response.end();
+        return;
+      });
+      return;
     } else if (request.url.startsWith("/teleListRecordings")) {
       const directoryPath = path.join(__dirname, 'otherProjects/tele/recordings');
       const files_names = [];
@@ -472,7 +508,7 @@ var server = http.createServer(function(request, response) {
         var id = data.id;
 
         let data_to_write = JSON.stringify(data);
-        fs.writeFileSync('otherProjects/dance/position.json', data_to_write);
+        fs.writeFileSync('otherProjects/positions/position_'+id+'.json', data_to_write);
         // step 1: copy the recording into the main file of recordings
         response.writeHead(200, {
           "Content-Type": "text/plain"
