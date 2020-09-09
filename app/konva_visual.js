@@ -1,14 +1,32 @@
 var width = window.innerWidth;
-var height = window.innerHeight - 300;
+var totalHeight = window.innerHeight;
+var lowerBarHeight = window.innerHeight * 0.4;
+
 
 var stage = new Konva.Stage({
-	container: 'container',
+	container: 'stage-container',
 	width: width,
-	height: height
+	height: totalHeight - lowerBarHeight
 });
 var samples_layer = new Konva.Layer();
 var trash_layer = new Konva.Layer();
 
+function fitStageIntoParentContainer() {
+	var container = document.querySelector('#stage-container');
+
+	var width = window.innerWidth;
+	var totalHeight = window.innerHeight;
+	var lowerBarHeight = window.innerHeight * 0.4;
+
+	//basically just make sure you can get the current container width and height later and use that to change the container size through the scale function
+	stage.width(width);
+	stage.height(totalHeight - lowerBarHeight);
+	stage.draw();
+}
+
+fitStageIntoParentContainer();
+// adapt the stage on any window resize
+window.addEventListener('resize', fitStageIntoParentContainer);
 
 if (VIEWER_MODE == 'master') {
 	// main API:
@@ -64,9 +82,9 @@ function addLabelWithParam(param) {
 			y: 5,
 			text: label_options[MY_PARAM_TO_CONTROL][0],
 			fontSize: text_height,
-			fontFamily: 'arial',
-			fill: '#404040',
-			opacity: 0.5
+			fontFamily: 'Roboto',
+			fill: '#3C2F33',
+			opacity: 0.6
 
 		});
 		label2 = new Konva.Text({
@@ -74,9 +92,9 @@ function addLabelWithParam(param) {
 			y: height - text_height - 5,
 			text: label_options[MY_PARAM_TO_CONTROL][1],
 			fontSize: text_height,
-			fontFamily: 'arial',
-			fill: '#404040',
-			opacity: 0.5
+			fontFamily: 'Roboto',
+			fill: '#3C2F33',
+			opacity: 0.6
 		});
 		big_text_layer.add(label1);
 		big_text_layer.add(label2);
@@ -115,11 +133,11 @@ var red_line_layer = new Konva.Layer();
 
 var redLine = new Konva.Line({
 	points: [0, 0, 0, height],
-	stroke: 'red',
+	stroke: '#F1784B',
 	strokeWidth: 7,
 	lineCap: 'round',
 	lineJoin: 'round',
-	opacity: 0.9,
+	opacity: 0.8,
 });
 red_line_layer.add(redLine)
 var anim = new Konva.Animation(function(frame) {
