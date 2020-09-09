@@ -2,3 +2,5 @@
 *.DS_Store
 score.json
 node_modules/*
+app/christian-test.js
+app/.vs/VSWorkspaceState.json
