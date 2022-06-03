@@ -1,0 +1,82 @@
+﻿<!doctype html>
+<html lang="en">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pizzicato/0.6.1/Pizzicato.min.js"></script>
+<head>
+    <title>earTalk</title>
+    <script src="https://unpkg.com/konva@4.1.5/konva.min.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" type="text/css" href="go_new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #DFD9CD;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="heading" style="margin: 2px">
+        <a href="/index.html" style="text-align: center;" class="home-link">Ear Talk</a>
+    </div>
+    <div id="allInteration">
+        <div id="stage-container"></div>
+        <div class="row">
+            <div id="role">
+                <div class="role-area">
+                    <h3>Roles</h3>
+                    <ol>
+                        <li class="role"><a class="active-role " onclick="paramChange('volume')">Volume</a><input type="checkbox" id="volume-box" onclick="paramChange('pan')"/><span class="check active-check"></span></li>
+                        <li class="role"><a onclick="paramChange('pan')">Pan</a><input type="checkbox" id="pan-box" onclick="paramChange('pan')"/><span class="check"></span></li>
+                        <li class="role"><a onclick="paramChange('distort')">Distortion</a><input type="checkbox" id="distort-box" onclick="paramChange('distort')"/><span class="check"></span></li>
+                        <li class="role"><a onclick="paramChange('lowpass')">Clarity</a><input type="checkbox" id="lowpass-box" onclick="paramChange('lowpass')"/><span class="check"></span></li>
+                    </ol>
+                </div>
+            </div>
+            <!-- below contains material for master viewer only!! includes: mute, record, upload-->
+            <div class="button-area">
+                <div id="show_for_master_viewer">
+                    <ul>
+                        <li><button onclick="doMute()" class="mute-btn inline"></button></li><li class="inline"><p id="myMuteButton" >mute</p></li>
+                        <li><button id="startRecordButton" type="button" onclick="startRecording()" class="record-btn"></button></li><li class="inline"><p>record from mic</p></li>
+                        <li><div id="record-div"><button id="stopRecordButton" type="button" class="record-btn" onclick="stopRecording()" style="display:none;">stop</button></div></li>
+                        <li><div id="file-form">
+                                <form id='fileUploadForm' action="/upload" enctype="multipart/form-data" method="post">
+                                    <label>
+                                        Upload<input id="file" type="file" name="upload" hidden required>
+                                    </label>
+                                </form>
+                                <input type="submit" value="Upload" hidden>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="log-area">
+                <h3>History</h3>
+                <div id="history_log" class="wrap log-wrap"></div>
+            </div>
+            <div class="chat-area">
+                <h3>Chat</h3>
+                <div id="chat_log" class="wrap chat-wrap"></div>
+                <div id="send-message-div">
+                    <p>Send message:</p>
+                    <input type="text" id="message_box" name="message_box" style="width: 100%"><br />
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="customlibs.js"></script>
+    <script src="corelogic.js"></script>
+    <script src="start.js"></script>
+    <script src="NoSleep.js"></script>
+    <script src='konva_visual.js'></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script src="christian-test.js"></script>
+</body>
