@@ -48,6 +48,7 @@ ANIMATION_TIME_CURRENT = 0;
 IS_FIRST_TIME_LOADING_CHAT = true;
 MY_PARAM_TO_CONTROL = 'volume'; // should be volume or pan for now, something else maybe later. 
 var recorder = null;
+var how_long_to_disable_dragging = 10;
 
 TIME_OFFSET = 0;
 

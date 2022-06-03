@@ -230,7 +230,7 @@ function doAnimationScoreUpdate() {
 			if (!isDraggable()) {
 				return;
 			}
-			disableDragging(10);
+			disableDragging(how_long_to_disable_dragging);
 			if (VIEWER_MODE == 'master') {
 				group = GROUP_TO_USE
 				if (e.evt.layerX > width - 50) {

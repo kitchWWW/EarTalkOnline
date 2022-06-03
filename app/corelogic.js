@@ -167,4 +167,22 @@ function doInit() {
     loadFile(fileName)
     scoreAllSoundInstructions[fileName] = myNewObject;
   });
+
+  var how_long_to_delay = getUrlVars()['delay']
+  if(how_long_to_delay != undefined){
+    how_long_to_disable_dragging = parseInt(how_long_to_delay)
+  }
+
+  var should_mute_right_away = getUrlVars()['mute']
+  if(should_mute_right_away != undefined){
+    if(should_mute_right_away == 'true'){
+      setTimeout(doMute,1000);
+    }
+  }
+
+
+
+
+
+
 }
