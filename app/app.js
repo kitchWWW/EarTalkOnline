@@ -144,6 +144,12 @@ var server = http.createServer(function(request, response) {
         return;
       });
       return;
+    }else if (request.url.startsWith("/videoPerformance")) {
+      response.writeHead(307, {
+          Location: 'https://www.youtube.com/watch?v=go2HeT8CgVY'
+        });
+        response.end();
+      return;
     } else if (request.url.startsWith("/teleListRecordings")) {
       const directoryPath = path.join(__dirname, 'otherProjects/tele/recordings');
       const files_names = [];
